@@ -2,7 +2,7 @@ import { Stack } from "expo-router";
 import "../../global.css";
 
 export default function RootLayout() {
-  const isSignedIn = false;
+  const isSignedIn = true;
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Protected guard={!isSignedIn}>

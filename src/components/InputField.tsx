@@ -1,3 +1,4 @@
+// Inside your components/InputField.tsx
 import { COLORS } from "@/utils/colors";
 import { Info } from "lucide-react-native";
 import React from "react";
@@ -14,6 +15,7 @@ interface InputFieldProps extends TextInputProps {
   label?: string;
   error?: string;
   containerStyle?: ViewStyle;
+  rightIcon?: React.ReactNode; // Add this
 }
 
 const InputField: React.FC<InputFieldProps> = ({
@@ -21,21 +23,25 @@ const InputField: React.FC<InputFieldProps> = ({
   error,
   containerStyle,
   style,
+  rightIcon,
   ...props
 }) => {
   return (
     <View style={[styles.container, containerStyle]}>
       {label && <Text style={styles.inputLabel}>{label}</Text>}
 
-      <TextInput
-        style={[
-          styles.inputField,
-          error ? styles.inputErrorBorder : null,
-          style,
-        ]}
-        placeholderTextColor={COLORS.gray}
-        {...props}
-      />
+      <View style={styles.inputWrapper}>
+        <TextInput
+          style={[
+            styles.inputField,
+            error ? styles.inputErrorBorder : null,
+            style,
+          ]}
+          placeholderTextColor={COLORS.gray}
+          {...props}
+        />
+        {rightIcon && <View style={styles.iconContainer}>{rightIcon}</View>}
+      </View>
 
       {error?.trim() ? (
         <View style={styles.errorBox}>
@@ -48,10 +54,7 @@ const InputField: React.FC<InputFieldProps> = ({
 };
 
 const styles = StyleSheet.create({
-  container: {
-    width: "100%",
-    marginBottom: 24,
-  },
+  container: { width: "100%", marginBottom: 24 },
   inputLabel: {
     fontWeight: "600",
     fontSize: 14,
@@ -59,6 +62,10 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     textTransform: "uppercase",
     letterSpacing: 1,
+  },
+  inputWrapper: {
+    position: "relative",
+    justifyContent: "center",
   },
   inputField: {
     height: 56,
@@ -68,24 +75,21 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     color: COLORS.light,
     paddingHorizontal: 16,
+    paddingRight: 50, // Added padding so text doesn't go under the icon
     fontSize: 16,
   },
-  inputErrorBorder: {
-    borderWidth: 0.5,
-    borderColor: "#FF4D4D",
+  iconContainer: {
+    position: "absolute",
+    right: 16,
   },
+  inputErrorBorder: { borderWidth: 1, borderColor: "#FF4D4D" },
   errorBox: {
     flexDirection: "row",
     gap: 4,
     marginTop: 8,
-    marginBottom: 24,
     alignItems: "center",
   },
-  errorMessage: {
-    color: "#FF4D4D",
-    fontSize: 12,
-    fontWeight: "500",
-  },
+  errorMessage: { color: "#FF4D4D", fontSize: 12, fontWeight: "500" },
 });
 
 export default InputField;
