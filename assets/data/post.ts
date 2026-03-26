@@ -28,7 +28,7 @@ export const MOCK_POSTS = [
       "Is it just me, or is the Wi-Fi in the basement of the Library actually powered by a single potato? 🥔📶",
     likes: 189,
     comments: 54,
-    postImage: require("$/images/wifi_struggle.png"),
+    postImage: require("$/icons/google.png"),
   },
   {
     id: "4",
@@ -69,7 +69,7 @@ export const MOCK_POSTS = [
       "Hackathon registration is now OPEN! 🚀 First 50 sign-ups get a limited edition 'Hello World' hoodie.",
     likes: 210,
     comments: 31,
-    postImage: require("$/images/hackathon_banner.png"),
+    postImage: require("$/images/icon.png"),
   },
   {
     id: "8",

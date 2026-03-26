@@ -21,7 +21,6 @@ const InfoItem = ({ label, value }: { label: string; value: string }) => (
       <CircleUser color="white" size={14} />
       <Text style={styles.labelText}>{label}</Text>
     </View>
-    <Text style={styles.dot}>•</Text>
     <Text style={styles.valueText}>{value}</Text>
   </View>
 );
@@ -75,7 +74,7 @@ export default function ProfileScreen() {
               marginVertical: 5,
             }}
           />
-          <InfoItem label="Anonymous name" value="Shinny Squirrel" />
+          <InfoItem label="Username" value="@shinny_squirrel" />
         </View>
       </View>
 
@@ -194,6 +193,7 @@ const styles = StyleSheet.create({
   itemWrapper: {
     flexDirection: "row",
     alignItems: "center",
+    paddingVertical: 8,
     justifyContent: "space-between",
   },
   labelGroup: {
@@ -206,10 +206,6 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: "700",
     textTransform: "uppercase",
-  },
-  dot: {
-    color: "white",
-    fontSize: 30,
   },
   valueText: {
     color: COLORS.accent,
