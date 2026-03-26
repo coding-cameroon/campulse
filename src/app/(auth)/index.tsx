@@ -34,7 +34,7 @@ const OnBoardingScreen = () => {
       return;
     }
 
-    router.push("/(auth)/sign-in");
+    router.push("/(auth)/auth");
   };
 
   return (
