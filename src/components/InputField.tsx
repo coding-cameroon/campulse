@@ -1,6 +1,5 @@
 // Inside your components/InputField.tsx
 import { COLORS } from "@/utils/colors";
-import { Info } from "lucide-react-native";
 import React from "react";
 import {
   StyleSheet,
@@ -13,14 +12,12 @@ import {
 
 interface InputFieldProps extends TextInputProps {
   label?: string;
-  error?: string;
   containerStyle?: ViewStyle;
   rightIcon?: React.ReactNode; // Add this
 }
 
 const InputField: React.FC<InputFieldProps> = ({
   label,
-  error,
   containerStyle,
   style,
   rightIcon,
@@ -32,23 +29,19 @@ const InputField: React.FC<InputFieldProps> = ({
 
       <View style={styles.inputWrapper}>
         <TextInput
-          style={[
-            styles.inputField,
-            error ? styles.inputErrorBorder : null,
-            style,
-          ]}
+          style={[styles.inputField, style]}
           placeholderTextColor={COLORS.gray}
           {...props}
         />
         {rightIcon && <View style={styles.iconContainer}>{rightIcon}</View>}
       </View>
 
-      {error?.trim() ? (
+      {/* {error?.trim() ? (
         <View style={styles.errorBox}>
           <Info color="#FF4D4D" size={12} />
           <Text style={styles.errorMessage}>{error}</Text>
         </View>
-      ) : null}
+      ) : null} */}
     </View>
   );
 };
@@ -83,13 +76,6 @@ const styles = StyleSheet.create({
     right: 16,
   },
   inputErrorBorder: { borderWidth: 1, borderColor: "#FF4D4D" },
-  errorBox: {
-    flexDirection: "row",
-    gap: 4,
-    marginTop: 8,
-    alignItems: "center",
-  },
-  errorMessage: { color: "#FF4D4D", fontSize: 12, fontWeight: "500" },
 });
 
 export default InputField;

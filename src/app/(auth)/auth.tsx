@@ -1,4 +1,5 @@
 import Button from "@/components/Button";
+import GoogleAuth from "@/components/GoogleAuth";
 import { COLORS } from "@/utils/colors";
 import { useRouter } from "expo-router";
 import { ArrowRight } from "lucide-react-native";
@@ -46,21 +47,7 @@ const AuthScreen = () => {
               <Text style={styles.orText}>OR</Text>
               <View style={styles.line} />
             </View>
-
-            <Button
-              onPress={() => {
-                /* Handle Google Auth */
-              }}
-            >
-              <View style={[styles.buttonInner, { gap: 12 }]}>
-                <Image
-                  source={require("$/icons/google.png")}
-                  style={{ width: 25, height: 25 }}
-                  resizeMode="contain"
-                />
-                <Text style={styles.buttonText}>Continue with Google</Text>
-              </View>
-            </Button>
+            <GoogleAuth />
           </View>
 
           <View style={styles.footer}>
@@ -139,10 +126,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "700",
     color: "black",
-  },
-  googleIcon: {
-    width: 24,
-    height: 24,
   },
   dividerContainer: {
     flexDirection: "row",

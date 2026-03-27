@@ -8,7 +8,6 @@ import {
   Plus,
   UserRound,
 } from "lucide-react-native";
-
 import { StyleSheet } from "react-native";
 
 export default function HomeLayout() {
@@ -16,9 +15,16 @@ export default function HomeLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarStyle: styles.tabBarContainer,
+        tabBarShowLabel: false, // Keep it clean without text labels
         tabBarInactiveTintColor: COLORS.light,
-        tabBarActiveTintColor: COLORS["dark-1"],
+        tabBarActiveTintColor: COLORS.accent, // Using accent for the active icon
+        tabBarStyle: {
+          paddingTop: 5,
+          paddingBottom: 15,
+          borderTopWidth: 0.5,
+          height: 110,
+          backgroundColor: COLORS["dark-3"],
+        },
       }}
     >
       <Tabs.Screen
@@ -65,20 +71,4 @@ export default function HomeLayout() {
   );
 }
 
-const styles = StyleSheet.create({
-  tabBarContainer: {
-    position: "absolute",
-    bottom: 50,
-    left: 30,
-    right: 30,
-    height: 65,
-    display: "flex",
-    marginHorizontal: 30,
-    backgroundColor: COLORS["dark-1"],
-    borderRadius: 35,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    elevation: 0,
-  },
-});
+const styles = StyleSheet.create({});

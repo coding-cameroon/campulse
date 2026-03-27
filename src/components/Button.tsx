@@ -34,7 +34,7 @@ export default function Button({
           alignItems: "center",
           justifyContent: "center",
           flexDirection: "row",
-          opacity: !isIntaractive ? 1 : 0.8,
+          opacity: !isIntaractive ? 1 : 0.6,
         },
         style as ViewStyle,
       ]}

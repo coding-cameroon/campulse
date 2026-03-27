@@ -2,7 +2,7 @@ import Button from "@/components/Button";
 import InputField from "@/components/InputField";
 import { COLORS } from "@/utils/colors";
 import { router } from "expo-router";
-import { ArrowRight } from "lucide-react-native";
+import { ArrowRight, Info } from "lucide-react-native";
 import React, { useState } from "react";
 import {
   Image,
@@ -72,9 +72,15 @@ const OnBoardingScreen = () => {
                   autoCapitalize="none"
                   onChangeText={setEmail}
                   value={email}
-                  error={error}
                   placeholderTextColor={COLORS.gray}
                 />
+
+                {error && (
+                  <View style={styles.errorBox}>
+                    <Info color="#FF4D4D" size={12} />
+                    <Text style={styles.errorMessage}>{error}</Text>
+                  </View>
+                )}
 
                 <Button onPress={handleOnboarding}>
                   <View style={styles.buttonInner}>
@@ -155,6 +161,14 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: "black",
   },
+  errorBox: {
+    flexDirection: "row",
+    gap: 4,
+    marginTop: -15,
+    marginBottom: 20,
+    alignItems: "center",
+  },
+  errorMessage: { color: "#FF4D4D", fontSize: 13, fontWeight: "500" },
 });
 
 export default OnBoardingScreen;

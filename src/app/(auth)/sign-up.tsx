@@ -1,16 +1,18 @@
 import Button from "@/components/Button";
 import InputField from "@/components/InputField";
 import { COLORS } from "@/utils/colors";
-import { useRouter } from "expo-router";
+import { useAuth, useSignUp, useUser } from "@clerk/expo";
+import { Href, useRouter } from "expo-router";
 import {
   ArrowRight,
   Eye,
   EyeOff,
+  Info,
   MailCheck,
   RefreshCw,
   ShieldCheck,
 } from "lucide-react-native";
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Image,
   KeyboardAvoidingView,
@@ -25,50 +27,62 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 const SignUpScreen = () => {
   const router = useRouter();
-  const [formData, setFormData] = useState({ email: "", password: "" });
-  const [showPassword, setShowPassword] = useState(false);
+  const { signUp } = useSignUp();
+
+  const [emailAddress, setEmailAddress] = useState("");
+  const [password, setPassword] = useState("");
+  const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [verification, setVerification] = useState(false);
-  const [otp, setOtp] = useState("");
-  const [otpError, setOtpError] = useState("");
+  const [error, setError] = useState<any>("");
+  const [showPassword, setShowPassword] = useState(false);
 
-  const otpCode = "123456";
-
-  const handleSignUp = async () => {
-    if (!formData.email || !formData.password) {
-      setError("All fields are required to join.");
-      return;
-    }
+  const handleSubmit = async () => {
     setLoading(true);
     setError("");
 
-    // Simulate API call
-    setTimeout(() => {
+    const { error } = await signUp.password({
+      emailAddress,
+      password,
+    });
+
+    if (error) {
       setLoading(false);
-      setVerification(true);
-    }, 2000);
-  };
-
-  const handleVerify = () => {
-    setOtpError("");
-
-    if (otp.length < 6) {
-      return setOtpError("Please enter the full 6-digit code.");
+      console.log(JSON.stringify(error, null, 2));
+      setError(error);
+      return;
     }
 
-    setLoading(true);
-
-    setTimeout(() => {
-      setLoading(false);
-
-      if (otp !== otpCode) {
-        return setOtpError("Invalid OTP. Provide a valid OTP Code");
-      } else {
-        return router.push("/(home)");
-      }
-    }, 1500);
+    if (!error) await signUp.verifications.sendEmailCode();
   };
+
+  const handleVerify = async () => {
+    await signUp.verifications.verifyEmailCode({
+      code,
+    });
+
+    if (signUp.status === "complete") {
+      await signUp.finalize({
+        // Redirect the user to the home page after signing up
+        navigate: ({ session, decorateUrl }) => {
+          if (session?.currentTask) {
+            console.log({ session: session?.currentTask });
+            return;
+          }
+
+          const url = decorateUrl("/");
+          if (url.startsWith("http")) {
+            window.location.href = url;
+          } else {
+            router.push(url as Href);
+          }
+        },
+      });
+    }
+  };
+
+  const { user } = useUser();
+  const { isSignedIn } = useAuth();
+  console.log(isSignedIn);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -90,7 +104,9 @@ const SignUpScreen = () => {
             />
           </View>
 
-          {verification ? (
+          {signUp.status === "missing_requirements" &&
+          signUp.unverifiedFields.includes("email_address") &&
+          signUp.missingFields.length === 0 ? (
             <View style={styles.bottomSection}>
               <View style={styles.textGroup}>
                 <View style={styles.iconCircle}>
@@ -100,7 +116,7 @@ const SignUpScreen = () => {
                 <Text style={styles.subHeaderText}>
                   We sent an OTP verification code to{" "}
                   <Text style={{ color: COLORS.light, fontWeight: "600" }}>
-                    {formData.email}
+                    {emailAddress}
                   </Text>
                 </Text>
               </View>
@@ -109,16 +125,15 @@ const SignUpScreen = () => {
                 <InputField
                   label="Verification Code"
                   placeholder="000000"
-                  value={otp}
-                  onChangeText={setOtp}
+                  value={code}
+                  onChangeText={setCode}
                   keyboardType="number-pad"
                   maxLength={6}
-                  error={otpError}
                   autoFocus
                   style={styles.otpInput}
                 />
 
-                <Button loading={loading} onPress={handleVerify}>
+                <Button onPress={handleVerify}>
                   <Text style={styles.buttonText}>Verify Account</Text>
                 </Button>
 
@@ -140,12 +155,10 @@ const SignUpScreen = () => {
 
               <View style={styles.form}>
                 <InputField
-                  label="School Email"
+                  label="Email"
                   placeholder="johndoe@gmail.com"
-                  value={formData.email}
-                  onChangeText={(val) =>
-                    setFormData({ ...formData, email: val })
-                  }
+                  value={emailAddress}
+                  onChangeText={setEmailAddress}
                   keyboardType="email-address"
                   autoCapitalize="none"
                 />
@@ -153,12 +166,10 @@ const SignUpScreen = () => {
                 <InputField
                   label="Password"
                   placeholder="********"
-                  value={formData.password}
-                  onChangeText={(val) =>
-                    setFormData({ ...formData, password: val })
-                  }
+                  value={password}
+                  onChangeText={setPassword}
                   secureTextEntry={!showPassword}
-                  error={error}
+                  // error={error}
                   rightIcon={
                     <TouchableOpacity
                       onPress={() => setShowPassword(!showPassword)}
@@ -172,7 +183,18 @@ const SignUpScreen = () => {
                   }
                 />
 
-                <Button loading={loading} onPress={handleSignUp}>
+                {error && (
+                  <View style={styles.errorBox}>
+                    <Info color="#FF4D4D" size={12} />
+                    <Text style={styles.errorMessage}>
+                      {error.errors[0].message ||
+                        error.errors[0].longMessage ||
+                        error}
+                    </Text>
+                  </View>
+                )}
+
+                <Button onPress={handleSubmit} loading={loading}>
                   <View style={styles.buttonInner}>
                     <Text style={styles.buttonText}>Get Started</Text>
                     <ArrowRight
@@ -299,6 +321,14 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     textDecorationLine: "underline",
   },
+  errorBox: {
+    flexDirection: "row",
+    gap: 4,
+    marginTop: -15,
+    marginBottom: 20,
+    alignItems: "center",
+  },
+  errorMessage: { color: "#FF4D4D", fontSize: 13, fontWeight: "500" },
 });
 
 export default SignUpScreen;
