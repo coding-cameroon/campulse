@@ -1,124 +1,100 @@
 import { MOCK_POSTS } from "$/data/post";
+import InputField from "@/components/InputField";
 import PostCard from "@/components/PostCard";
 import { COLORS } from "@/utils/colors";
+import { Search, X } from "lucide-react-native";
 import React, { useState } from "react";
-import {
-  FlatList,
-  Image,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function EventScreen() {
+  const insets = useSafeAreaInsets();
   const [isSearching, setIsSearching] = useState(false);
   const [searchText, setSearchText] = useState("");
 
+  const filteredPosts = MOCK_POSTS.filter(
+    (post) =>
+      post.author.username?.includes(searchText) ||
+      post.content.includes(searchText),
+  );
+
   const Header = () => (
-    <View style={styles.headerFloatingContainer}>
+    /* We add padding top based on the device's notch/status bar height */
+    <View
+      className="absolute top-0 left-0 right-0 z-10 bg-black/90 px-4 pb-4"
+      style={{ paddingTop: insets.top + 5 }}
+    >
       {/* STATIC TITLE */}
-      <View style={styles.titleContainer}>
-        <Text style={styles.headerTitle}>The Wall</Text>
+      <View className="px-2 py-2">
+        <Text className="text-white text-[44px] font-[900] tracking-tighter">
+          The Wall
+        </Text>
       </View>
 
       {/* FLOATING INTERACTIVE BAR */}
-      <View style={styles.headerInner}>
+      <View className="flex-row items-center justify-between bg-white/10 rounded-full px-2 py-2 border border-white/10">
+        {/* profile */}
         <TouchableOpacity activeOpacity={0.7}>
           <Image
             source={require("$/images/icon.png")}
-            style={styles.userAvatar}
+            className="w-10 h-10 rounded-full border-[1.5px] border-[#333]"
           />
         </TouchableOpacity>
 
-        <View style={styles.middleSection}>
-          <View style={styles.accentBadge}>
-            <Text numberOfLines={1} style={styles.badgeText}>
-              Anonymous • Ephemeral • 24 hours
-            </Text>
-          </View>
+        {/* content */}
+        <View className="flex-1 mx-2">
+          {!isSearching ? (
+            <View
+              className="rounded-full py-2.5 px-4"
+              style={{ backgroundColor: COLORS.accent }}
+            >
+              <Text
+                numberOfLines={1}
+                className="text-black text-sm font-extrabold text-center"
+              >
+                Anonymous • Ephemeral • 24 hours
+              </Text>
+            </View>
+          ) : (
+            <InputField
+              autoFocus
+              onChangeText={setSearchText}
+              placeholder="What are you looking for?"
+              style={{ borderRadius: 60, height: 37, marginBottom: -24 }}
+            />
+          )}
         </View>
+
+        {/* action */}
+        <TouchableOpacity
+          onPress={() => setIsSearching(!isSearching)}
+          className="bg-dark-2 rounded-full size-[34px] flex items-center justify-center"
+        >
+          {isSearching ? (
+            <X color="white" size={20} />
+          ) : (
+            <Search color="white" size={20} />
+          )}
+        </TouchableOpacity>
       </View>
     </View>
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View className="flex-1 bg-black">
       <FlatList
-        data={MOCK_POSTS}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <PostCard
-            username={item.username}
-            timeAgo={item.timeAgo}
-            timeLeft={item.timeLeft}
-            content={item.content}
-            likes={item.likes}
-            comments={item.comments}
-            postImage={item.postImage}
-          />
-        )}
+        data={filteredPosts}
+        keyExtractor={(item) => item._id}
+        renderItem={({ item }) => <PostCard post={item} />}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.listContent}
+        /* Adjusted paddingTop to match the dynamic header height */
+        contentContainerStyle={{
+          paddingTop: insets.top + 160,
+          paddingBottom: 5,
+          paddingHorizontal: 8,
+        }}
       />
       <Header />
-    </SafeAreaView>
+    </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "black" },
-  headerFloatingContainer: {
-    position: "absolute",
-    top: 10,
-    left: 0,
-    right: 0,
-    zIndex: 10,
-    paddingHorizontal: 10,
-    backgroundColor: "black",
-    paddingBottom: 15,
-  },
-  titleContainer: { paddingHorizontal: 8, paddingTop: 10, paddingBottom: 10 },
-  headerTitle: {
-    color: "white",
-    fontSize: 40,
-    fontWeight: "900",
-    letterSpacing: -1.5,
-  },
-  headerInner: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    backgroundColor: "rgba(255,255,255,0.08)",
-    borderRadius: 50,
-    paddingHorizontal: 8,
-    paddingVertical: 8,
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.1)",
-  },
-  middleSection: { flex: 1, marginHorizontal: 10 },
-  accentBadge: {
-    backgroundColor: COLORS.accent,
-    borderRadius: 40,
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-  },
-  badgeText: {
-    fontSize: 16,
-    fontWeight: "800",
-    color: "black",
-    textAlign: "center",
-  },
-  searchBarContainer: { justifyContent: "center" },
-
-  userAvatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    borderWidth: 1.5,
-    borderColor: "#333",
-  },
-  searchToggle: { paddingHorizontal: 10 },
-  listContent: { paddingTop: 160, paddingBottom: 100 },
-});

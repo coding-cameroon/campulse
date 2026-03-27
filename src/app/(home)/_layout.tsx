@@ -17,7 +17,7 @@ export default function HomeLayout() {
         headerShown: false,
         tabBarShowLabel: false, // Keep it clean without text labels
         tabBarInactiveTintColor: COLORS.light,
-        tabBarActiveTintColor: COLORS.accent, // Using accent for the active icon
+        tabBarActiveTintColor: COLORS["dark-3"], // Using accent for the active icon
         tabBarStyle: {
           paddingTop: 5,
           paddingBottom: 15,

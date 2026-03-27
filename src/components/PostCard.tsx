@@ -1,244 +1,159 @@
-import { COLORS } from "@/utils/colors";
-import {
-  BrickWallFire,
-  Heart,
-  MessageCircleMore,
-  Share2,
-} from "lucide-react-native";
-import React, { useState } from "react";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withSequence,
-  withSpring,
-} from "react-native-reanimated";
+import { formatDistanceToNow } from "date-fns";
+import { BrickWallFire, Heart, MessageCircleMore } from "lucide-react-native";
+import React, { useRef, useState } from "react";
+import { Animated, Image, Text, TouchableOpacity, View } from "react-native";
 
-interface PostCardProps {
-  userImage?: any;
-  username: string;
-  timeAgo: string;
-  timeLeft: string;
-  content: string;
-  postImage?: any;
-  likes: number;
-  comments: number;
-  onAvatarPress?: () => void;
-}
+import { getTimeLeft } from "@/utils/date";
+import { Post } from "../../types";
+import SimpleImageAlert from "./ImageOverLay";
 
-const PostCard = ({
-  userImage,
-  username,
-  timeAgo,
-  timeLeft,
-  content,
-  postImage,
-  likes,
-  comments,
-  onAvatarPress,
-}: PostCardProps) => {
-  const [isLiked, setIsLiked] = useState(false);
-  const scale = useSharedValue(1);
+const PostCard = ({ post }: { post: Post }) => {
+  const [selectedImg, setSelectedImg] = useState(null);
+  const [isLiked, setIsLiked] = useState(post.isLikedByMe || false);
+  const [likesCount, setLikesCount] = useState(post.likesCount || 0);
 
-  const heartStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
+  // 1. Initialize the scale value (starting at 1)
+  const scaleAnim = useRef(new Animated.Value(1)).current;
 
   const handleLike = () => {
-    const newValue = !isLiked;
-    setIsLiked(newValue);
+    // 2. Toggle state
+    const newLikedStatus = !isLiked;
+    setIsLiked(newLikedStatus);
+    setLikesCount((prev) => (newLikedStatus ? prev + 1 : prev - 1));
 
-    if (newValue) {
-      // Pumping/Pulse animation sequence
-      scale.value = withSequence(
-        withSpring(1.4), // Expand
-        withSpring(1.0), // Settle back
-      );
-    }
+    // 3. Trigger the Pulse Sequence
+    Animated.sequence([
+      // Scale up to 1.4x
+      Animated.spring(scaleAnim, {
+        toValue: 1.4,
+        friction: 3,
+        useNativeDriver: true,
+      }),
+      // Snap back to 1x
+      Animated.spring(scaleAnim, {
+        toValue: 1,
+        friction: 5,
+        useNativeDriver: true,
+      }),
+    ]).start();
   };
 
   return (
-    <View style={styles.cardContainer}>
-      {/* LEFT SIDE: AVATAR */}
-      <View style={styles.avatarColumn}>
-        <TouchableOpacity onPress={onAvatarPress} activeOpacity={0.8}>
-          <Image
-            resizeMode="cover"
-            source={userImage || require("$/images/icon.png")}
-            style={styles.avatar}
-          />
-        </TouchableOpacity>
-        {/* Stroke/Vertical Line removed as requested */}
+    <View className="flex-row gap-3 items-start justify-center mb-8 ">
+      {/* User Avatar */}
+      <View className="overflow-hidden rounded-full border border-gray-800">
+        <Image
+          source={
+            post.author.avatarUrl
+              ? { uri: post.author.avatarUrl }
+              : require("$/images/icon.png")
+          }
+          className="w-[35px] h-[35px]"
+          resizeMode="cover"
+        />
       </View>
 
-      {/* RIGHT SIDE: CONTENT */}
-      <View style={styles.contentColumn}>
-        <View style={styles.headerRow}>
-          <View style={styles.userInfo}>
-            <Text style={styles.username}>{username}</Text>
-            <Text style={styles.dot}>•</Text>
-            <Text style={styles.timeAgo}>{timeAgo}</Text>
+      <View className="flex-1 rounded-2xl overflow-hidden border-[0.5px] border-dark-1 bg-dark-2/60">
+        {/* Header */}
+        <View className="flex-row items-center justify-between p-3 pb-1">
+          <View className="flex-row gap-2 items-center">
+            <Text className="text-[17px] font-bold text-white">
+              @{post.author.username}
+            </Text>
+            <Text
+              className="text-md font-semibold text-gray-300"
+              style={{ color: "white" }}
+            >
+              •
+            </Text>
+            <Text className="text-sm font-bold text-white">
+              {post.createdAt
+                ? formatDistanceToNow(new Date(post.createdAt), {})
+                    .replace("about ", "")
+                    .replace(" less than a minute", "1 min")
+                    .replace(" minute", " min")
+                    .replace(" hour", " hr") + " ago"
+                : "Just now"}
+            </Text>
           </View>
 
-          <View style={styles.timerBadge}>
-            <BrickWallFire size={14} color="#FF4500" />
-            <Text style={styles.timerText}>{timeLeft}</Text>
+          {/* Time Left Badge */}
+          <View className="flex-row items-center justify-center gap-1 bg-red-500/10 rounded-full border-[0.5px] border-red-500/50 p-1 px-3">
+            <BrickWallFire size={14} color="#dc2626" />
+            <Text className="text-red-600 text-[10px] font-bold uppercase">
+              {getTimeLeft(post.expiresAt)}
+            </Text>
           </View>
         </View>
 
-        <View style={styles.body}>
-          <Text style={styles.contentText}>{content}</Text>
+        {/* Post Content */}
+        <View className="px-3 py-2 mb-2">
+          <Text className="text-[15px] text-white font-semibold leading-5">
+            {post.content}
+          </Text>
         </View>
 
-        {postImage && (
-          <View style={styles.imageContainer}>
+        {/* Main Post Image */}
+        {post.postImage && (
+          <TouchableOpacity
+            onPress={() => {
+              setSelectedImg(post.postImage);
+            }}
+            className="px-3 pb-2"
+          >
             <Image
+              source={
+                typeof post.postImage === "string"
+                  ? { uri: post.postImage }
+                  : post.postImage
+              }
+              className="w-full h-[220px] rounded-xl"
               resizeMode="cover"
-              source={postImage}
-              style={styles.postMedia}
             />
-          </View>
+          </TouchableOpacity>
         )}
 
-        {/* FOOTER: INTERACTIONS */}
-        <View style={styles.footer}>
+        <SimpleImageAlert
+          visible={!!selectedImg}
+          onClose={() => setSelectedImg(null)}
+          imageSource={
+            typeof selectedImg === "string" ? { uri: selectedImg } : selectedImg
+          }
+        />
+
+        {/* Footer Actions */}
+        <View className="flex-row items-center justify-end px-3 gap-3 mb-4 mt-1">
           <TouchableOpacity
-            style={styles.interactionButton}
             onPress={handleLike}
             activeOpacity={0.7}
+            className="flex-row gap-1.5 items-center justify-center bg-white/5 p-2 px-4 rounded-full border-[0.5px] border-dark-1"
           >
-            <Animated.View style={heartStyle}>
+            {/* 4. Wrap the Icon in an Animated View to apply the scale */}
+            <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
               <Heart
-                size={20}
-                color={isLiked ? "#FF3B30" : COLORS.gray}
-                fill={isLiked ? "#FF3B30" : "transparent"}
+                size={18}
+                color={isLiked ? "#FF4D4D" : "white"}
+                fill={isLiked ? "#FF4D4D" : "transparent"}
               />
             </Animated.View>
+
             <Text
-              style={[styles.interactionText, isLiked && { color: "#FF3B30" }]}
+              className={`font-bold text-xs ${isLiked ? "text-[#FF4D4D]" : "text-white"}`}
             >
-              {isLiked ? likes + 1 : likes}
+              {likesCount}
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.interactionButton}
-            activeOpacity={0.6}
-          >
-            <MessageCircleMore size={20} color={COLORS.gray} />
-            <Text style={styles.interactionText}>{comments}</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.interactionButton}
-            activeOpacity={0.6}
-          >
-            <Share2 size={18} color={COLORS.gray} />
+          <TouchableOpacity className="flex-row gap-1.5 items-center justify-center bg-white/5 p-2 px-4 border-[0.5px] border-dark-1 rounded-full">
+            <MessageCircleMore size={18} color="white" />
+            <Text className="text-white font-bold text-xs">
+              {post.commentsCount}
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  cardContainer: {
-    flexDirection: "row",
-    backgroundColor: "black",
-    padding: 16,
-    // Bottom border removed for a "floating" or "seamless" unique look
-  },
-  avatarColumn: {
-    alignItems: "center",
-    marginRight: 12,
-  },
-  avatar: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: "#1A1A1A",
-    borderWidth: 1,
-    borderColor: "#333", // Subtle border for the avatar itself
-  },
-  contentColumn: {
-    flex: 1,
-  },
-  headerRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 6,
-  },
-  userInfo: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-  },
-  username: {
-    color: "white",
-    fontWeight: "700",
-    fontSize: 15,
-  },
-  dot: {
-    color: COLORS.gray,
-    fontSize: 12,
-  },
-  timeAgo: {
-    color: COLORS.gray,
-    fontSize: 14,
-  },
-  timerBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "rgba(255, 69, 0, 0.05)",
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8, // More angular, modern look
-    gap: 4,
-    borderWidth: 1, // Added border as requested
-    borderColor: "rgba(255, 69, 0, 0.3)",
-  },
-  timerText: {
-    color: "#FF4500",
-    fontSize: 11,
-    fontWeight: "800",
-    textTransform: "uppercase",
-  },
-  body: {
-    marginBottom: 12,
-  },
-  contentText: {
-    color: "#E1E1E1",
-    fontSize: 15,
-    lineHeight: 22,
-  },
-  imageContainer: {
-    borderRadius: 12,
-    overflow: "hidden",
-    borderWidth: 1,
-    borderColor: "#222",
-    marginBottom: 12,
-  },
-  postMedia: {
-    width: "100%",
-    height: 250,
-  },
-  footer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingRight: 40,
-    marginTop: 4,
-  },
-  interactionButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-  },
-  interactionText: {
-    color: COLORS.gray,
-    fontSize: 13,
-    fontWeight: "600",
-  },
-});
 
 export default PostCard;
