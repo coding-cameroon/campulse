@@ -2,6 +2,7 @@ import { ClerkLoaded, ClerkProvider, useAuth } from "@clerk/expo";
 import { tokenCache } from "@clerk/expo/token-cache";
 import { Stack } from "expo-router";
 
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "../../global.css";
 
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
@@ -29,7 +30,9 @@ export default function RootLayout() {
   return (
     <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
       <ClerkLoaded>
-        <RootStack />
+        <GestureHandlerRootView>
+          <RootStack />
+        </GestureHandlerRootView>
       </ClerkLoaded>
     </ClerkProvider>
   );

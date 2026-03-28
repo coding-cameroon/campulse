@@ -1,4 +1,5 @@
 import { MOCK_POSTS } from "$/data/post";
+import CustomBottomSheet from "@/components/CustomBottomSheet";
 import InputField from "@/components/InputField";
 import PostCard from "@/components/PostCard";
 import { COLORS } from "@/utils/colors";
@@ -95,6 +96,7 @@ export default function EventScreen() {
         }}
       />
       <Header />
+      <CustomBottomSheet />
     </View>
   );
 }

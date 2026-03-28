@@ -49,7 +49,7 @@ const SimpleImageAlert = ({
           {/* The Actual Image */}
           <Image
             source={imageSource}
-            className="w-full h-full"
+            className="w-full h-full rounded-lg"
             resizeMode="contain"
           />
         </View>

@@ -107,7 +107,8 @@ const PostCard = ({ post }: { post: Post }) => {
                   ? { uri: post.postImage }
                   : post.postImage
               }
-              className="w-full h-[220px] rounded-xl"
+              className="w-full rounded-xl"
+              style={{ aspectRatio: 1 }} // Keeps it square but shows the full image inside
               resizeMode="cover"
             />
           </TouchableOpacity>

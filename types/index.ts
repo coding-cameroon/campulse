@@ -18,6 +18,19 @@ export interface Post {
   isLikedByMe?: boolean;
 }
 
+export interface Comment {
+  _id: string;
+  postId: string;
+  userId: string;
+  content: string;
+  createdAt: string | Date;
+  expiresAt: string | Date;
+}
+
+export interface BottomSheetProps {
+  replyingTo: Author;
+  comments: Comment[];
+}
 // Props for the PostCard component
 export interface PostCardProps {
   post: Post;
