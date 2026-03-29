@@ -41,6 +41,18 @@ export interface LostAndFoundPost {
   commentsCount: number;
 }
 
+export interface Polygon {
+  longitude: number;
+  latitude: number;
+}
+
+export interface InitialRegion {
+  longitude: number;
+  latitude: number;
+  latitudeDelta: number;
+  longitudeDelta: number;
+}
+
 export interface Comment {
   _id: string;
   postId: string;

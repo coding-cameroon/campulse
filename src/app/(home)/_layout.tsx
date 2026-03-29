@@ -15,9 +15,9 @@ export default function HomeLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarShowLabel: false, // Keep it clean without text labels
+        tabBarShowLabel: false,
         tabBarInactiveTintColor: COLORS.light,
-        tabBarActiveTintColor: COLORS["dark-3"], // Using accent for the active icon
+        tabBarActiveTintColor: COLORS["dark-3"],
         tabBarStyle: {
           paddingTop: 5,
           paddingBottom: 15,

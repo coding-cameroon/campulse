@@ -52,7 +52,13 @@
       "expo-font",
       "expo-image",
       "expo-web-browser",
-      "@clerk/expo"
+      "@clerk/expo",
+      [
+        "react-native-maps",
+        {
+          "androidGoogleMapsApiKey": "AIzaSyDgp0QEuhELXd4VlDNUlnMrcq4V3MeP1mw"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
