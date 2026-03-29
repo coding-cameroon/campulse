@@ -6,7 +6,13 @@ import { formatDate, getTimeLeft } from "@/utils/date";
 import { Post } from "../../types";
 import SimpleImageAlert from "./ImageOverLay";
 
-const PostCard = ({ post }: { post: Post }) => {
+const PostCard = ({
+  post,
+  onPressEvent,
+}: {
+  post: Post;
+  onPressEvent: () => void;
+}) => {
   const [selectedImg, setSelectedImg] = useState(null);
   const [isLiked, setIsLiked] = useState(post.isLikedByMe || false);
   const [likesCount, setLikesCount] = useState(post.likesCount || 0);
@@ -138,7 +144,10 @@ const PostCard = ({ post }: { post: Post }) => {
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity className="flex-row gap-1.5 items-center justify-center bg-white/5 p-2 px-4 border-[0.5px] border-dark-1 rounded-full">
+          <TouchableOpacity
+            onPress={onPressEvent}
+            className="flex-row gap-1.5 items-center justify-center bg-white/5 p-2 px-4 border-[0.5px] border-dark-1 rounded-full"
+          >
             <MessageCircleMore size={18} color="white" />
             <Text className="text-white font-bold text-xs">
               {post.commentsCount}

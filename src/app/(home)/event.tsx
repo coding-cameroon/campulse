@@ -3,8 +3,9 @@ import CustomBottomSheet from "@/components/CustomBottomSheet";
 import InputField from "@/components/InputField";
 import PostCard from "@/components/PostCard";
 import { COLORS } from "@/utils/colors";
+import BottomSheet from "@gorhom/bottom-sheet";
 import { Search, X } from "lucide-react-native";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -12,6 +13,12 @@ export default function EventScreen() {
   const insets = useSafeAreaInsets();
   const [isSearching, setIsSearching] = useState(false);
   const [searchText, setSearchText] = useState("");
+
+  const sheetRef = useRef<BottomSheet>(null);
+
+  const handleOpenSheet = () => {
+    sheetRef.current?.expand();
+  };
 
   const filteredPosts = MOCK_POSTS.filter(
     (post) =>
@@ -86,9 +93,10 @@ export default function EventScreen() {
       <FlatList
         data={filteredPosts}
         keyExtractor={(item) => item._id}
-        renderItem={({ item }) => <PostCard post={item} />}
+        renderItem={({ item }) => (
+          <PostCard post={item} onPressEvent={handleOpenSheet} />
+        )}
         showsVerticalScrollIndicator={false}
-        /* Adjusted paddingTop to match the dynamic header height */
         contentContainerStyle={{
           paddingTop: insets.top + 160,
           paddingBottom: 5,
@@ -96,7 +104,7 @@ export default function EventScreen() {
         }}
       />
       <Header />
-      <CustomBottomSheet />
+      <CustomBottomSheet ref={sheetRef} />
     </View>
   );
 }
