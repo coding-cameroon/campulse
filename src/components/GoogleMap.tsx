@@ -1,14 +1,35 @@
 import React from "react";
 import { Dimensions, StyleSheet } from "react-native";
-import MapView, { Polyline, PROVIDER_GOOGLE } from "react-native-maps";
-import { InitialRegion, Polygon } from "../../types/index";
+import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from "react-native-maps";
+import {
+  CampusEvent,
+  EventCategory,
+  InitialRegion,
+  Polygon,
+} from "../../types/index";
 
 interface MapProps {
+  markers?: CampusEvent[];
   iutRegion: InitialRegion;
-  iutDoualaPolygon: Polygon[];
+  iutDoualaPolygon?: Polygon[];
 }
 
-const GoogleMap = ({ iutRegion, iutDoualaPolygon }: MapProps) => {
+const GoogleMap = ({ iutRegion, iutDoualaPolygon, markers }: MapProps) => {
+  const getMarkerColor = (category: EventCategory) => {
+    switch (category) {
+      case "Tech":
+        return "#3b82f6"; // Blue
+      case "Sports":
+        return "#22c55e"; // Green
+      case "Social":
+        return "#ec4899"; // Pink
+      case "Academic":
+        return "#f59e0b"; // Orange
+      default:
+        return "#000000";
+    }
+  };
+
   return (
     <MapView
       style={styles.map}
@@ -24,12 +45,25 @@ const GoogleMap = ({ iutRegion, iutDoualaPolygon }: MapProps) => {
       // }
     >
       {/* The Pathway */}
-      <Polyline
-        coordinates={iutDoualaPolygon}
-        strokeColor="#f97316" // Your orange theme color
-        strokeWidth={4}
-        lineDashPattern={[1]} // Optional: makes it look like a dotted path
-      />
+      {iutDoualaPolygon && (
+        <Polyline
+          coordinates={iutDoualaPolygon}
+          strokeColor="#f97316" // Your orange theme color
+          strokeWidth={6}
+          lineDashPattern={[1]} // Optional: makes it look like a dotted path
+        />
+      )}
+
+      {markers &&
+        markers.map((marker: CampusEvent) => (
+          <Marker
+            key={marker._id}
+            title={marker.title}
+            coordinate={marker.coordinate}
+            pinColor={getMarkerColor(marker.category)}
+            description={`${marker.location} • ${marker.isFree ? "Free" : marker.price + " CFA"}`}
+          />
+        ))}
     </MapView>
   );
 };

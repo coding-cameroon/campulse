@@ -2,6 +2,7 @@ export interface Author {
   _id: string;
   fullName: string;
   email: string;
+  role: string;
   username?: string;
   avatarUrl?: string; // Maps to your $/images/icon.png or a URI
 }
@@ -16,14 +17,6 @@ export interface Post {
   createdAt: string | Date;
   expiresAt: string | Date; // For your "24 hours" ephemeral logic
   isLikedByMe?: boolean;
-}
-
-export interface Author {
-  _id: string;
-  fullName: string;
-  email: string;
-  username?: string;
-  avatarUrl?: string;
 }
 
 export interface LostAndFoundPost {
@@ -51,6 +44,35 @@ export interface InitialRegion {
   latitude: number;
   latitudeDelta: number;
   longitudeDelta: number;
+}
+
+export type EventCategory =
+  | "Academic"
+  | "Tech"
+  | "Social"
+  | "Career"
+  | "Sports";
+
+export interface CampusEvent {
+  _id: string;
+  title: string;
+  location: string;
+  coordinate: {
+    latitude: number;
+    longitude: number;
+  };
+  time: string;
+  description: string;
+  category: EventCategory;
+
+  author: Author;
+  images: string[];
+  isFree: boolean;
+  price?: number;
+
+  // Metadata
+  createdAt: Date | string;
+  updatedAt: Date | string;
 }
 
 export interface Comment {

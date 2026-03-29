@@ -1,4 +1,4 @@
-import { iutDoualaPolygon, iutRegion } from "$/data/map";
+import { iutDoualaPolygon, iutRegion, MOCK_CAMPUS_EVENTS } from "$/data/map";
 import GoogleMap from "@/components/GoogleMap";
 import { COLORS } from "@/utils/colors";
 import { useUser } from "@clerk/expo";
@@ -16,6 +16,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 export default function CampusMap() {
   const { user } = useUser();
   const insets = useSafeAreaInsets();
+  const [activeTab, setActiveTab] = useState<"map" | "events">("map");
 
   const getDisplayName = () => {
     if (user?.firstName) return user.firstName;
@@ -29,9 +30,6 @@ export default function CampusMap() {
   };
 
   const Header = () => {
-    // 1. Add state to track which view is active
-    const [activeTab, setActiveTab] = useState<"map" | "events">("map");
-
     const getDisplayName = () => {
       if (user?.firstName) return user.firstName;
       const emailHandle =
@@ -118,7 +116,11 @@ export default function CampusMap() {
 
   return (
     <View style={styles.container}>
-      <GoogleMap iutDoualaPolygon={iutDoualaPolygon} iutRegion={iutRegion} />
+      {activeTab === "map" ? (
+        <GoogleMap iutDoualaPolygon={iutDoualaPolygon} iutRegion={iutRegion} />
+      ) : (
+        <GoogleMap iutRegion={iutRegion} markers={MOCK_CAMPUS_EVENTS} />
+      )}
 
       <Header />
     </View>
