@@ -1,38 +1,50 @@
-import { useSSO } from "@clerk/expo";
-import React, { useState } from "react";
+import { isClerkAPIResponseError, useSSO } from "@clerk/expo";
+import * as AuthSessions from "expo-auth-session";
+import * as WebBrowser from "expo-web-browser";
+import React, { useEffect, useState } from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
 import Button from "./Button";
 
+WebBrowser.maybeCompleteAuthSession();
+
 const GoogleAuth = () => {
   const { startSSOFlow } = useSSO();
-  const [errors, setErrors] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
-  // const handleSignInWithGoogle = async () => {
-  //   try {
-  //     const { setActive, createdSessionId } = await startSSOFlow({
-  //       strategy: "oauth_google",
-  //       redirectUrl: AuthSessions.makeRedirectUri(),
-  //     });
+  useEffect(() => {
+    void WebBrowser.warmUpAsync();
+    return () => {
+      void WebBrowser.coolDownAsync();
+    };
+  }, []);
 
-  //     if (createdSessionId) {
-  //       setActive!({ session: createdSessionId });
-  //     } else {
-  //       setErrors(["No user session created."]);
-  //     }
-  //   } catch (error) {
-  //     if (isClerkAPIResponseError(error)) {
-  //       setErrors(error.errors);
-  //     } else {
-  //       setErrors(error as any);
-  //     }
-  //   }
-  // };
+  const handleSignInWithGoogle = async () => {
+    setLoading(true);
+    try {
+      // 2. Start the flow
+      const { setActive, createdSessionId } = await startSSOFlow({
+        strategy: "oauth_google",
+        redirectUrl: AuthSessions.makeRedirectUri({ scheme: "campulse" }),
+      });
+
+      if (createdSessionId && setActive) {
+        await setActive({ session: createdSessionId });
+      }
+    } catch (error) {
+      console.error("OAuth Error:", error);
+      if (isClerkAPIResponseError(error)) {
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <Button onPress={() => {}} disabled>
-      <View style={[styles.buttonInner, { gap: 12 }]}>
+    <Button onPress={handleSignInWithGoogle} loading={loading}>
+      <View style={styles.buttonInner}>
         <Image
           source={require("$/icons/google.png")}
-          style={{ width: 25, height: 25 }}
+          style={styles.googleIcon}
           resizeMode="contain"
         />
         <Text style={styles.buttonText}>Continue with Google</Text>
@@ -46,6 +58,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+    gap: 12,
   },
   buttonText: {
     fontSize: 18,
@@ -53,8 +66,8 @@ const styles = StyleSheet.create({
     color: "black",
   },
   googleIcon: {
-    width: 24,
-    height: 24,
+    width: 25,
+    height: 25,
   },
 });
 

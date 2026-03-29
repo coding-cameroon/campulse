@@ -1,7 +1,8 @@
 import Button from "@/components/Button";
 import GoogleAuth from "@/components/GoogleAuth";
 import { COLORS } from "@/utils/colors";
-import { useRouter } from "expo-router";
+import { useAuth } from "@clerk/expo";
+import { Redirect, useRouter } from "expo-router";
 import { ArrowRight } from "lucide-react-native";
 import React from "react";
 import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
@@ -9,6 +10,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 const AuthScreen = () => {
   const router = useRouter();
+  const { isSignedIn } = useAuth();
+
+  if (isSignedIn) return <Redirect href={"/(home)"} />;
 
   return (
     <SafeAreaView style={styles.container}>
