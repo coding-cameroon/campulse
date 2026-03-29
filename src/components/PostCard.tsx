@@ -1,9 +1,8 @@
-import { formatDistanceToNow } from "date-fns";
 import { BrickWallFire, Heart, MessageCircleMore } from "lucide-react-native";
 import React, { useRef, useState } from "react";
 import { Animated, Image, Text, TouchableOpacity, View } from "react-native";
 
-import { getTimeLeft } from "@/utils/date";
+import { formatDate, getTimeLeft } from "@/utils/date";
 import { Post } from "../../types";
 import SimpleImageAlert from "./ImageOverLay";
 
@@ -67,20 +66,14 @@ const PostCard = ({ post }: { post: Post }) => {
               •
             </Text>
             <Text className="text-sm font-bold text-white">
-              {post.createdAt
-                ? formatDistanceToNow(new Date(post.createdAt), {})
-                    .replace("about ", "")
-                    .replace(" less than a minute", "1 min")
-                    .replace(" minute", " min")
-                    .replace(" hour", " hr") + " ago"
-                : "Just now"}
+              {formatDate(post.createdAt)}
             </Text>
           </View>
 
           {/* Time Left Badge */}
-          <View className="flex-row items-center justify-center gap-1 bg-red-500/10 rounded-full border-[0.5px] border-red-500/50 p-1 px-3">
-            <BrickWallFire size={14} color="#dc2626" />
-            <Text className="text-red-600 text-[10px] font-bold uppercase">
+          <View className="flex-row items-center gap-1 bg-orange-500/10 rounded-full border-[0.5px] border-orange-500/50 p-1 px-3">
+            <BrickWallFire size={12} color="#f97316" />
+            <Text className="text-orange-500 text-[10px] font-black uppercase">
               {getTimeLeft(post.expiresAt)}
             </Text>
           </View>

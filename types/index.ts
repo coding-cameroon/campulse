@@ -18,6 +18,29 @@ export interface Post {
   isLikedByMe?: boolean;
 }
 
+export interface Author {
+  _id: string;
+  fullName: string;
+  email: string;
+  username?: string;
+  avatarUrl?: string;
+}
+
+export interface LostAndFoundPost {
+  _id: string;
+  author: Author;
+  title: string; // Brief headline (e.g., "Silver iPhone 15")
+  content: string; // Detailed description
+  lastSeenLocation: string; // Where it was lost/found
+  location: string; // Where the item/owner is now (e.g., "Security Office")
+  contactNumber: string;
+  images: string[];
+  createdAt: string;
+  expiresAt: string;
+  likesCount: number;
+  commentsCount: number;
+}
+
 export interface Comment {
   _id: string;
   postId: string;

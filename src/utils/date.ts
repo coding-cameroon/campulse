@@ -1,4 +1,8 @@
-import { differenceInHours, differenceInMinutes } from "date-fns";
+import {
+  differenceInHours,
+  differenceInMinutes,
+  formatDistanceToNow,
+} from "date-fns";
 
 export const getTimeLeft = (expiryDate: string | Date) => {
   const now = new Date();
@@ -14,4 +18,14 @@ export const getTimeLeft = (expiryDate: string | Date) => {
   } else {
     return "Expired";
   }
+};
+
+export const formatDate = (date: string | Date | number) => {
+  return (
+    formatDistanceToNow(new Date(date), {})
+      .replace("about ", "")
+      .replace(" less than a minute", "1 min")
+      .replace(" minute", " min")
+      .replace(" hour", " hr") + " ago"
+  );
 };

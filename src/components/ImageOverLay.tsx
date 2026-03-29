@@ -25,7 +25,7 @@ const SimpleImageAlert = ({
         className="flex-1 bg-black/90 justify-center items-center px-4"
       >
         <View className="w-full aspect-square max-w-[400px]">
-          <View className="flex-row items-center justify-between gap-2">
+          <View className="flex-row items-center justify-between mb-4">
             {/* download image */}
             <TouchableOpacity
               disabled
