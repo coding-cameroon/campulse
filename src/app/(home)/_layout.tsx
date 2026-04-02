@@ -3,10 +3,10 @@ import { COLORS } from "@/utils/colors";
 import { Tabs } from "expo-router";
 import {
   BrickWall,
+  CalendarDays,
   House,
   PackageSearch,
   Plus,
-  UserRound,
 } from "lucide-react-native";
 import { StyleSheet } from "react-native";
 
@@ -36,7 +36,7 @@ export default function HomeLayout() {
         }}
       />
       <Tabs.Screen
-        name="event"
+        name="post"
         options={{
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon Icon={BrickWall} color={color} focused={focused} />
@@ -60,10 +60,10 @@ export default function HomeLayout() {
         }}
       />
       <Tabs.Screen
-        name="profile"
+        name="event"
         options={{
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon Icon={UserRound} color={color} focused={focused} />
+            <TabBarIcon Icon={CalendarDays} color={color} focused={focused} />
           ),
         }}
       />

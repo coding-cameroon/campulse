@@ -2,6 +2,7 @@ import { iutDoualaPolygon, iutRegion, MOCK_CAMPUS_EVENTS } from "$/data/map";
 import GoogleMap from "@/components/GoogleMap";
 import { COLORS } from "@/utils/colors";
 import { useUser } from "@clerk/expo";
+import { router } from "expo-router";
 import React, { useState } from "react";
 import {
   Dimensions,
@@ -56,7 +57,11 @@ export default function CampusMap() {
         {/* FLOATING INTERACTIVE BAR */}
         <View className="flex-row items-center bg-white/10 rounded-full p-1.5 border border-white/10">
           {/* Profile Image */}
-          <View className="mr-2">
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={() => router.push("/user/profile")}
+            className="mr-2"
+          >
             <Image
               source={
                 user?.imageUrl
@@ -65,7 +70,7 @@ export default function CampusMap() {
               }
               className="w-10 h-10 rounded-full border-[1.5px] border-[#333]"
             />
-          </View>
+          </TouchableOpacity>
 
           {/* Switchable Buttons Container */}
           <View className="flex-1 flex-row gap-2">

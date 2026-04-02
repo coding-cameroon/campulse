@@ -1,7 +1,7 @@
 import Button from "@/components/Button";
 import InputField from "@/components/InputField";
 import { COLORS } from "@/utils/colors";
-import { useAuth, useSignUp, useUser } from "@clerk/expo";
+import { useSignUp } from "@clerk/expo";
 import { Href, useRouter } from "expo-router";
 import {
   ArrowRight,
@@ -33,7 +33,9 @@ const SignUpScreen = () => {
   const [password, setPassword] = useState("");
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
+  const [loadingVerify, setLoadingVerify] = useState(false);
   const [error, setError] = useState<any>("");
+  const [errorCode, setErrorCode] = useState<any>("");
   const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async () => {
@@ -56,33 +58,40 @@ const SignUpScreen = () => {
   };
 
   const handleVerify = async () => {
-    await signUp.verifications.verifyEmailCode({
-      code,
-    });
+    setLoadingVerify(true);
 
-    if (signUp.status === "complete") {
-      await signUp.finalize({
-        // Redirect the user to the home page after signing up
-        navigate: ({ session, decorateUrl }) => {
-          if (session?.currentTask) {
-            console.log({ session: session?.currentTask });
-            return;
-          }
-
-          const url = decorateUrl("/");
-          if (url.startsWith("http")) {
-            window.location.href = url;
-          } else {
-            router.push(url as Href);
-          }
-        },
+    try {
+      await signUp.verifications.verifyEmailCode({
+        code,
       });
+
+      if (signUp.status === "complete") {
+        await signUp.finalize({
+          // Redirect the user to the home page after signing up
+          navigate: ({ session, decorateUrl }) => {
+            if (session?.currentTask) {
+              console.log({ session: session?.currentTask });
+              return;
+            }
+
+            const url = decorateUrl("/(home)");
+            if (url.startsWith("http")) {
+              window.location.href = url;
+            } else {
+              router.push(url as Href);
+            }
+          },
+        });
+      }
+    } catch (error) {
+      console.log(JSON.stringify(error, null, 2));
+      setErrorCode(error);
+
+      alert(JSON.stringify(error, null, 2));
+    } finally {
+      setLoadingVerify(false);
     }
   };
-
-  const { user } = useUser();
-  const { isSignedIn } = useAuth();
-  console.log(isSignedIn);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -133,7 +142,10 @@ const SignUpScreen = () => {
                   style={styles.otpInput}
                 />
 
-                <Button onPress={handleVerify}>
+                <Button
+                  onPress={handleVerify}
+                  loading={loadingVerify && !!code}
+                >
                   <Text style={styles.buttonText}>Verify Account</Text>
                 </Button>
 
@@ -169,7 +181,6 @@ const SignUpScreen = () => {
                   value={password}
                   onChangeText={setPassword}
                   secureTextEntry={!showPassword}
-                  // error={error}
                   rightIcon={
                     <TouchableOpacity
                       onPress={() => setShowPassword(!showPassword)}

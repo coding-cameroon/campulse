@@ -11,7 +11,7 @@ const PostCard = ({
   onPressEvent,
 }: {
   post: Post;
-  onPressEvent: () => void;
+  onPressEvent: (id: string) => void;
 }) => {
   const [selectedImg, setSelectedImg] = useState(null);
   const [isLiked, setIsLiked] = useState(post.isLikedByMe || false);
@@ -63,7 +63,7 @@ const PostCard = ({
         <View className="flex-row items-center justify-between p-3 pb-1">
           <View className="flex-row gap-2 items-center">
             <Text className="text-[17px] font-bold text-white">
-              @{post.author.username}
+              {post.author.username}
             </Text>
             <Text
               className="text-md font-semibold text-gray-300"
@@ -145,7 +145,7 @@ const PostCard = ({
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={onPressEvent}
+            onPress={() => onPressEvent(post._id)}
             className="flex-row gap-1.5 items-center justify-center bg-white/5 p-2 px-4 border-[0.5px] border-dark-1 rounded-full"
           >
             <MessageCircleMore size={18} color="white" />

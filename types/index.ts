@@ -78,7 +78,7 @@ export interface CampusEvent {
 export interface Comment {
   _id: string;
   postId: string;
-  userId: string;
+  author: Author;
   content: string;
   createdAt: string | Date;
   expiresAt: string | Date;

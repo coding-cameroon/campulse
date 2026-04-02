@@ -5,6 +5,7 @@ export const MOCK_POSTS: Post[] = [
     _id: "1",
     author: {
       _id: "u1",
+      role: "user",
       fullName: "Shinny Squirrel",
       username: "shinnysquirrel",
       email: "anon1@wall.com",
@@ -25,6 +26,7 @@ export const MOCK_POSTS: Post[] = [
     _id: "2",
     author: {
       _id: "u2",
+      role: "user",
       fullName: "Mystic Mango",
       username: "mysticmango",
       email: "anon2@wall.com",
@@ -42,6 +44,7 @@ export const MOCK_POSTS: Post[] = [
     _id: "3",
     author: {
       _id: "u3",
+      role: "user",
       fullName: "Golden Lion",
       username: "goldenlion",
       email: "anon3@wall.com",
@@ -58,6 +61,7 @@ export const MOCK_POSTS: Post[] = [
     _id: "4",
     author: {
       _id: "u4",
+      role: "user",
       fullName: "Swift Cheetah",
       username: "swiftcheetah",
       email: "anon4@wall.com",
@@ -72,6 +76,7 @@ export const MOCK_POSTS: Post[] = [
     _id: "5",
     author: {
       _id: "u5",
+      role: "user",
       fullName: "Blue Falcon",
       username: "bluefalcon",
       email: "anon5@wall.com",
@@ -89,6 +94,7 @@ export const MOCK_POSTS: Post[] = [
     _id: "6",
     author: {
       _id: "u6",
+      role: "user",
       fullName: "Silent Panda",
       username: "silentpanda",
       email: "anon6@wall.com",
@@ -104,6 +110,7 @@ export const MOCK_POSTS: Post[] = [
     _id: "7",
     author: {
       _id: "u7",
+      role: "user",
       fullName: "Urban Eagle",
       username: "urbaneagle",
       email: "anon7@wall.com",
@@ -121,6 +128,7 @@ export const MOCK_POSTS: Post[] = [
     _id: "8",
     author: {
       _id: "u8",
+      role: "user",
       fullName: "Shadow Wolf",
       username: "shadowwolf",
       email: "anon8@wall.com",
@@ -135,6 +143,7 @@ export const MOCK_POSTS: Post[] = [
     _id: "9",
     author: {
       _id: "u9",
+      role: "user",
       fullName: "Hyper Hare",
       username: "hyperhare",
       email: "anon9@wall.com",
@@ -149,6 +158,7 @@ export const MOCK_POSTS: Post[] = [
     _id: "10",
     author: {
       _id: "u10",
+      role: "user",
       fullName: "Neon Cobra",
       username: "neoncobra",
       email: "anon10@wall.com",
@@ -165,6 +175,7 @@ export const MOCK_POSTS: Post[] = [
     _id: "11",
     author: {
       _id: "u11",
+      role: "user",
       fullName: "Iron Rhino",
       username: "ironrhino",
       email: "anon11@wall.com",
@@ -181,6 +192,7 @@ export const MOCK_POSTS: Post[] = [
     _id: "12",
     author: {
       _id: "u12",
+      role: "user",
       fullName: "Digital Nomad",
       username: "digitalnomad",
       email: "anon12@wall.com",
@@ -196,7 +208,8 @@ export const MOCK_POSTS: Post[] = [
     _id: "13",
     author: {
       _id: "u13",
-      fullName: "Night Owl",
+      role: "user",
+      fullName: "Niht Owl",
       username: "nightowl",
       email: "anon13@wall.com",
     },
@@ -212,6 +225,7 @@ export const MOCK_POSTS: Post[] = [
     _id: "14",
     author: {
       _id: "u14",
+      role: "user",
       fullName: "Cloud Walker",
       username: "cloudwalker",
       email: "anon14@wall.com",
@@ -228,6 +242,7 @@ export const MOCK_POSTS: Post[] = [
     _id: "15",
     author: {
       _id: "u15",
+      role: "user",
       fullName: "Pixel Pirate",
       username: "pixelpirate",
       email: "anon15@wall.com",
@@ -242,6 +257,7 @@ export const MOCK_POSTS: Post[] = [
     _id: "16",
     author: {
       _id: "u16",
+      role: "user",
       fullName: "Tech Titan",
       username: "techtitan",
       email: "anon16@wall.com",
@@ -258,6 +274,7 @@ export const MOCK_POSTS: Post[] = [
     _id: "17",
     author: {
       _id: "u17",
+      role: "user",
       fullName: "Velvet Fox",
       username: "velvetfox",
       email: "anon17@wall.com",
@@ -274,6 +291,7 @@ export const MOCK_POSTS: Post[] = [
     _id: "18",
     author: {
       _id: "u18",
+      role: "user",
       fullName: "Code Cracker",
       username: "codecracker",
       email: "anon18@wall.com",
@@ -288,6 +306,7 @@ export const MOCK_POSTS: Post[] = [
     _id: "19",
     author: {
       _id: "u19",
+      role: "user",
       fullName: "Lunar Lynx",
       username: "lunarlynx",
       email: "anon19@wall.com",
@@ -304,6 +323,7 @@ export const MOCK_POSTS: Post[] = [
     _id: "20",
     author: {
       _id: "u20",
+      role: "user",
       fullName: "Storm Seeker",
       username: "stormseeker",
       email: "anon20@wall.com",

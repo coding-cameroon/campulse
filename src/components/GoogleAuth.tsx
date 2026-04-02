@@ -40,7 +40,7 @@ const GoogleAuth = () => {
   };
 
   return (
-    <Button onPress={handleSignInWithGoogle} loading={loading}>
+    <Button onPress={handleSignInWithGoogle} loading={loading} disabled>
       <View style={styles.buttonInner}>
         <Image
           source={require("$/icons/google.png")}
