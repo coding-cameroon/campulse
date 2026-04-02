@@ -74,6 +74,7 @@ export const MOCK_CAMPUS_EVENTS: CampusEvent[] = [
     category: "Social",
     isFree: false,
     price: 2000,
+    phoneNumber: "680342873",
     author: {
       _id: "auth_01",
       fullName: "IUT Student Council",
@@ -82,6 +83,8 @@ export const MOCK_CAMPUS_EVENTS: CampusEvent[] = [
       avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=Council",
     },
     images: [
+      "https://picsum.photos/seed/party1/800/600",
+      "https://picsum.photos/seed/party1/800/600",
       "https://picsum.photos/seed/party1/800/600",
       "https://picsum.photos/seed/party2/800/600",
     ],
@@ -98,6 +101,7 @@ export const MOCK_CAMPUS_EVENTS: CampusEvent[] = [
       "Learn how to build mobile apps with Expo and Tailwind CSS. Bring your laptop!",
     category: "Tech",
     isFree: true,
+    phoneNumber: "680342873",
     author: {
       _id: "auth_02",
       fullName: "Tech Club IUT",
@@ -119,6 +123,7 @@ export const MOCK_CAMPUS_EVENTS: CampusEvent[] = [
       "Final match between Level 1 and Level 2 Engineering students.",
     category: "Sports",
     isFree: true,
+    phoneNumber: "680342873",
     author: {
       _id: "auth_03",
       fullName: "Sports Director",
@@ -140,6 +145,7 @@ export const MOCK_CAMPUS_EVENTS: CampusEvent[] = [
       "A professional from a top Douala agency talks about landing your first design job.",
     category: "Career",
     isFree: true,
+    phoneNumber: "680342873",
     author: {
       _id: "auth_04",
       fullName: "Career Services",
@@ -161,6 +167,7 @@ export const MOCK_CAMPUS_EVENTS: CampusEvent[] = [
     category: "Career",
     isFree: false,
     price: 5000,
+    phoneNumber: "680342873",
     author: {
       _id: "auth_05",
       fullName: "Dr. Kamga",
@@ -181,6 +188,7 @@ export const MOCK_CAMPUS_EVENTS: CampusEvent[] = [
       "Is AI a threat to junior developers? A heated debate between students.",
     category: "Academic",
     isFree: true,
+    phoneNumber: "680342873",
     author: {
       _id: "auth_02",
       fullName: "Tech Club IUT",
@@ -201,6 +209,7 @@ export const MOCK_CAMPUS_EVENTS: CampusEvent[] = [
       "Display of traditional foods and attire from all 10 regions of Cameroon.",
     category: "Social",
     isFree: true,
+    phoneNumber: "680342873",
     author: {
       _id: "auth_01",
       fullName: "IUT Student Council",
@@ -220,6 +229,7 @@ export const MOCK_CAMPUS_EVENTS: CampusEvent[] = [
     description: "Intensive revision for the upcoming semester exams.",
     category: "Academic",
     isFree: true,
+    phoneNumber: "680342873",
     author: {
       _id: "auth_06",
       fullName: "Academic Committee",
@@ -240,6 +250,7 @@ export const MOCK_CAMPUS_EVENTS: CampusEvent[] = [
     category: "Sports",
     isFree: false,
     price: 1000,
+    phoneNumber: "680342873",
     author: {
       _id: "auth_03",
       fullName: "Sports Director",
@@ -260,6 +271,7 @@ export const MOCK_CAMPUS_EVENTS: CampusEvent[] = [
     category: "Tech",
     isFree: false,
     price: 3000,
+    phoneNumber: "680342873",
     author: {
       _id: "auth_02",
       fullName: "Tech Club IUT",

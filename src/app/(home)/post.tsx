@@ -1,3 +1,4 @@
+import { MOCK_COMMENTS } from "$/data/comments";
 import { MOCK_POSTS } from "$/data/post";
 import CustomBottomSheet from "@/components/CustomBottomSheet";
 import InputField from "@/components/InputField";
@@ -17,9 +18,16 @@ export default function PostScreen() {
 
   const sheetRef = useRef<BottomSheet>(null);
 
-  // const handleOpenSheet = (id:string) => {
-  //   sheetRef.current?.expand();
-  // };
+  const eventComments = MOCK_COMMENTS.filter(
+    (cmt) => cmt.postId === selectedPostId,
+  );
+
+  const handleAddEventComment = async (
+    eventId: string | null,
+    text: string,
+  ) => {
+    if (!eventId || !text.trim()) return;
+  };
 
   const handleOpenSheet = useCallback((id: string) => {
     setSelectedPostId(id);
@@ -113,7 +121,11 @@ export default function PostScreen() {
         }}
       />
       <Header />
-      <CustomBottomSheet ref={sheetRef} postId={selectedPostId} />
+      <CustomBottomSheet
+        ref={sheetRef}
+        comments={eventComments}
+        onSendComment={(text) => handleAddEventComment(selectedPostId, text)}
+      />
     </View>
   );
 }

@@ -1,8 +1,16 @@
-import BottomSheet from "@gorhom/bottom-sheet";
-import { CalendarDays, X } from "lucide-react-native";
-import React, { useEffect, useMemo, useRef } from "react";
+import { MOCK_CAMPUS_EVENTS } from "$/data/map";
+import { COLORS } from "@/utils/colors";
+import { Fontisto } from "@expo/vector-icons";
+import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
+import dayjs from "dayjs";
+import * as Linking from "expo-linking";
+import { CalendarDays, Clock, MapPin, Ticket, X } from "lucide-react-native";
+import React, { useMemo, useRef, useState } from "react";
 import {
+  Alert,
   Dimensions,
+  Image,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -40,21 +48,41 @@ const GoogleMap = ({ iutRegion, iutDoualaPolygon, markers }: MapProps) => {
 
   const snapPoints = useMemo(() => ["25%", "50%", "70%", "80%"], []);
   const sheetRef = useRef<BottomSheet>(null);
+  const [event, setEvent] = useState<CampusEvent>();
+  const [activeImg, setActiveImg] = useState<string | null>();
 
   const handleOpenSheet = (id: string) => {
-    sheetRef.current?.expand();
+    sheetRef.current?.snapToIndex(2);
 
-    // const filteredEvents = MOCK_CAMPUS_EVENTS.filter(
-    //   (event) => event._id === id,
-    // );
+    const filteredEvents = MOCK_CAMPUS_EVENTS.find((event) => event._id === id);
+    setEvent(filteredEvents);
+
+    setActiveImg("");
   };
-
-  useEffect(() => {
-    handleOpenSheet("hey");
-  }, []);
 
   const handleCloseSheet = () => {
     sheetRef.current?.close();
+  };
+
+  const openWhatsApp = (phoneNumber: string) => {
+    const cleanNumber = phoneNumber.trim();
+    const message = `Hello! I'm interested in the event: *${event?.title}* 🗓️
+
+📍 *Location:* ${event?.location}
+⏰ *Time:* ${dayjs(event?.time).format("MMM D, YYYY h:mm A").toUpperCase()}
+💰 *Entry:* ${event?.isFree ? "Free" : `${event?.price} CFA`}
+
+I'd like to get more information or confirm my attendance. Looking forward to your reply!`;
+
+    const url = `whatsapp://send?phone=${cleanNumber}&text=${encodeURIComponent(message)}`;
+
+    Linking.canOpenURL(url).then((supported) => {
+      if (supported) {
+        Linking.openURL(url);
+      } else {
+        Alert.alert("Error", "WhatsApp is not installed on this device");
+      }
+    });
   };
 
   return (
@@ -97,37 +125,173 @@ const GoogleMap = ({ iutRegion, iutDoualaPolygon, markers }: MapProps) => {
       </MapView>
 
       <BottomSheet
-        index={1}
+        index={-1}
         ref={sheetRef}
         snapPoints={snapPoints}
         enablePanDownToClose={true}
         handleIndicatorStyle={{ display: "none" }}
         backgroundStyle={{ backgroundColor: "#111" }}
       >
-        <View className="flex-1 px-2">
-          {/* HEADER */}
-          <View className="flex-row gap-2 items-center justify-between px-3">
-            <View className="flex-row gap-2 items-center justify-start">
-              <View className="size-11 rounded-xl bg-accent p-2">
-                <CalendarDays />
+        <BottomSheetView style={{ flex: 1 }}>
+          <View className="flex-1 px-2">
+            {/* HEADER */}
+            <View className="flex-row gap-2 items-center justify-between px-3">
+              <View className="flex-1 flex-row gap-3 items-center justify-start">
+                <View className="size-12 rounded-2xl bg-accent items-center justify-center shrink-0">
+                  <CalendarDays color="black" size={24} />
+                </View>
+
+                <View className="flex-1">
+                  <Text
+                    className="text-2xl font-black tracking-tight text-white"
+                    numberOfLines={2}
+                  >
+                    {event?.title}
+                  </Text>
+                  <View className="flex-row items-center gap-1">
+                    <View className="px-2 py-0.5 rounded-md bg-zinc-800">
+                      <Text className="text-[10px] font-bold uppercase text-accent">
+                        {event?.category}
+                      </Text>
+                    </View>
+                    <Text className="text-zinc-500 text-xs">•</Text>
+                    <Text className="text-zinc-400 text-xs">
+                      Hosted by {event?.author.fullName.split(" ")[0]}
+                    </Text>
+                  </View>
+                </View>
               </View>
-              <Text className="text-xl font-bold tracking-wider text-white">
-                Campus Event
-              </Text>
+
+              <TouchableOpacity
+                onPress={handleCloseSheet}
+                className="bg-zinc-800 size-9 items-center justify-center rounded-full border border-zinc-700"
+              >
+                <X color={"#a1a1aa"} size={20} />
+              </TouchableOpacity>
             </View>
-            <TouchableOpacity
-              activeOpacity={0.7}
-              onPress={handleCloseSheet}
-              className="bg-dark-1 size-8 items-center justify-center border-[0.5px] border-[#555] rounded-full"
+
+            {/* CONTENT AREA */}
+            <ScrollView
+              className="flex-1 mt-6 px-3"
+              showsVerticalScrollIndicator={false}
             >
-              <X color={"white"} size={20} />
-            </TouchableOpacity>
+              {/* INFO GRID */}
+              <View className="flex-row flex-wrap gap-4 mb-6">
+                {/* Time Info */}
+                <View className="flex-row items-center gap-3 w-[45%]">
+                  <View className="size-9 rounded-full bg-zinc-900 items-center justify-center border border-zinc-800">
+                    <Clock color="#a1a1aa" size={18} />
+                  </View>
+                  <View>
+                    <Text className="text-zinc-500 text-[10px] uppercase font-bold">
+                      Time
+                    </Text>
+                    <Text className="text-white text-sm font-medium uppercase">
+                      {dayjs(event?.time).format("MMM D, YYYY h:mm A")}
+                    </Text>
+                  </View>
+                </View>
+
+                {/* Location Info */}
+                <View className="flex-row items-center gap-3 w-[45%]">
+                  <View className="size-9 rounded-full bg-zinc-900 items-center justify-center border border-zinc-800">
+                    <MapPin color="#a1a1aa" size={18} />
+                  </View>
+                  <View>
+                    <Text className="text-zinc-500 text-[10px] uppercase font-bold">
+                      Location
+                    </Text>
+                    <Text
+                      className="text-white text-sm font-medium"
+                      numberOfLines={1}
+                    >
+                      {event?.location}
+                    </Text>
+                  </View>
+                </View>
+
+                {/* Price Info */}
+                <View className="flex-row items-center gap-3 w-[45%]">
+                  <View className="size-9 rounded-full bg-zinc-900 items-center justify-center border border-zinc-800">
+                    <Ticket color="#a1a1aa" size={18} />
+                  </View>
+                  <View>
+                    <Text className="text-zinc-500 text-[10px] uppercase font-bold">
+                      Entry
+                    </Text>
+                    <Text
+                      className={`text-sm font-bold ${event?.isFree ? "text-green-400" : "text-white"}`}
+                    >
+                      {event?.isFree ? "FREE" : `$${event?.price}`}
+                    </Text>
+                  </View>
+                </View>
+              </View>
+
+              {/* DESCRIPTION */}
+              <View className="mb-8">
+                <Text className="text-zinc-500 text-[10px] uppercase font-bold mb-2 tracking-widest">
+                  About Event
+                </Text>
+                <Text className="text-zinc-300 text-[15px] leading-6">
+                  {event?.description ||
+                    "No description provided for this event."}
+                </Text>
+              </View>
+
+              {/* ORGANIZER MINI CARD */}
+              <View className="bg-zinc-900/50 p-4 rounded-3xl border border-zinc-800 flex-row mb-10">
+                <Image
+                  source={{ uri: activeImg || event?.images[0] }}
+                  style={{ width: "100%", height: 300, borderRadius: 10 }}
+                />
+              </View>
+            </ScrollView>
+
+            {/* FOOTER ACTION */}
+
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{
+                width: "100%",
+                alignItems: "center",
+                gap: 8,
+              }}
+              className="bg-zinc-900/50 p-4 rounded-3xl border border-zinc-800 flex-row mb-10"
+            >
+              {event?.images.map((img, idx) => (
+                <TouchableOpacity onPress={() => setActiveImg(img)}>
+                  <Image
+                    key={img + idx + Date.now()}
+                    source={{ uri: img }}
+                    style={[
+                      { width: 50, height: 50, borderRadius: 10 },
+                      activeImg === img
+                        ? { borderWidth: 2, borderColor: COLORS.accent }
+                        : "",
+                    ]}
+                  />
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+            <View
+              className="px-4 pt-4 border-t border-zinc-900"
+              style={{ paddingBottom: 20 }}
+            >
+              <TouchableOpacity
+                activeOpacity={0.8}
+                className="bg-accent flex-row gap-2 h-14 rounded-2xl items-center justify-center shadow-lg shadow-accent/20"
+                onPress={() => openWhatsApp(event?.phoneNumber as string)}
+              >
+                <Fontisto name="whatsapp" size={20} color="black" />
+                <Text className="text-black text-lg font-black italic uppercase">
+                  {event?.isFree ? "RSVP Now" : "Get Tickets"}
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
-          {/* CONTENT */}
-          <View>
-            <Text>content</Text>
-          </View>
-        </View>
+        </BottomSheetView>
       </BottomSheet>
     </>
   );

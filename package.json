@@ -19,6 +19,7 @@
     "@react-navigation/native": "^7.1.8",
     "classnames": "^2.5.1",
     "date-fns": "^4.1.0",
+    "dayjs": "^1.11.20",
     "expo": "^55.0.0",
     "expo-auth-session": "~55.0.9",
     "expo-constants": "~55.0.8",

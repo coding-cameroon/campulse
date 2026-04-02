@@ -18,12 +18,20 @@ import {
 } from "react-native";
 
 import { formatDate, getTimeLeft } from "@/utils/date";
+import { Fontisto } from "@expo/vector-icons";
+import { Alert } from "react-native";
 import { LostAndFoundPost } from "../../types";
 import SimpleImageAlert from "./ImageOverLay";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
-const LostAndFoundCard = ({ post }: { post: LostAndFoundPost }) => {
+const LostAndFoundCard = ({
+  post,
+  onPressItem,
+}: {
+  post: LostAndFoundPost;
+  onPressItem: () => void;
+}) => {
   const [selectedImg, setSelectedImg] = useState<string | null>(null);
   const [likesCount, setLikesCount] = useState(post.likesCount || 0);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -54,10 +62,44 @@ const LostAndFoundCard = ({ post }: { post: LostAndFoundPost }) => {
     ]).start();
   };
 
-  const handleContact = () => {
-    if (post.contactNumber) {
-      Linking.openURL(`tel:${post.contactNumber}`);
-    }
+  const handleWhatsApp = () => {
+    const cleanNumber = post.contactNumber.replace(/[^\d]/g, "");
+
+    const fullNumber = cleanNumber.startsWith("237")
+      ? cleanNumber
+      : `237${cleanNumber}`;
+
+    const message = `Hello! I'm reaching out regarding the *Lost & Found* post for: *${post.title}* 🔍
+
+📍 *Found at/near:* ${post.location}
+📝 *Description:* ${post.content}
+
+I believe this belongs to me (or I have found this item). Please let me know how we can coordinate the return. Thank you!`;
+
+    const url = `whatsapp://send?phone=${fullNumber}&text=${encodeURIComponent(message)}`;
+
+    Linking.canOpenURL(url).then((supported) => {
+      if (supported) {
+        Linking.openURL(url);
+      } else {
+        Linking.openURL(
+          `https://wa.me/${fullNumber}?text=${encodeURIComponent(message)}`,
+        );
+      }
+    });
+  };
+
+  const handleCall = () => {
+    const cleanNumber = post.contactNumber.replace(/[^\d+]/g, "");
+    const url = `tel:${cleanNumber}`;
+
+    Linking.canOpenURL(url).then((supported) => {
+      if (supported) {
+        Linking.openURL(url);
+      } else {
+        Alert.alert("Error", "Phone calls are not supported on this device.");
+      }
+    });
   };
 
   return (
@@ -156,13 +198,23 @@ const LostAndFoundCard = ({ post }: { post: LostAndFoundPost }) => {
 
         {/* Footer */}
         <View className="flex-row items-center justify-between px-3 mb-4 mt-1">
-          <TouchableOpacity
-            onPress={handleContact}
-            className="flex-row gap-2 items-center bg-green-500/20 p-2 px-4 rounded-full border-[0.5px] border-green-500/50"
-          >
-            <Phone size={14} color="#22c55e" />
-            <Text className="text-green-500 font-bold text-xs">Call</Text>
-          </TouchableOpacity>
+          <View className="flex-row gap-3 mt-4">
+            {/* Phone Call Button */}
+            <TouchableOpacity
+              onPress={handleCall} // Assuming you have a separate call handler
+              className="bg-blue-500/10 p-2.5 px-5 rounded-full border-[0.5px] border-blue-500/40"
+            >
+              <Phone size={16} color="#3b82f6" strokeWidth={2.5} />
+            </TouchableOpacity>
+
+            {/* WhatsApp Button */}
+            <TouchableOpacity
+              onPress={handleWhatsApp}
+              className="bg-green-500/10 p-2.5 px-5 rounded-full border-[0.5px] border-green-500/40"
+            >
+              <Fontisto name="whatsapp" size={16} color="#22c55e" />
+            </TouchableOpacity>
+          </View>
 
           <View className="flex-row gap-3">
             <TouchableOpacity
@@ -179,7 +231,10 @@ const LostAndFoundCard = ({ post }: { post: LostAndFoundPost }) => {
               <Text className="font-bold text-xs text-white">{likesCount}</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity className="flex-row gap-1.5 items-center bg-white/5 p-2 px-4 rounded-full border-[0.5px] border-dark-1">
+            <TouchableOpacity
+              onPress={onPressItem}
+              className="flex-row gap-1.5 items-center bg-white/5 p-2 px-4 rounded-full border-[0.5px] border-dark-1"
+            >
               <MessageCircleMore size={18} color="white" />
               <Text className="font-bold text-xs text-white">{likesCount}</Text>
             </TouchableOpacity>

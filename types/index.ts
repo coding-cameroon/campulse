@@ -69,6 +69,7 @@ export interface CampusEvent {
   images: string[];
   isFree: boolean;
   price?: number;
+  phoneNumber: string;
 
   // Metadata
   createdAt: Date | string;
