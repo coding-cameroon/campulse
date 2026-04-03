@@ -1,6 +1,11 @@
+import { iutRegion } from "$/data/map";
 import Button from "@/components/Button";
 import InputField from "@/components/InputField";
 import { COLORS } from "@/utils/colors";
+import BottomSheet, {
+  BottomSheetBackdrop,
+  BottomSheetView,
+} from "@gorhom/bottom-sheet";
 import {
   Calendar,
   Camera,
@@ -12,18 +17,19 @@ import {
   Megaphone,
   Search,
   User,
+  X,
 } from "lucide-react-native";
-import React, { useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import MapView from "react-native-maps";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const POST_TYPES = [
   { id: "announcement", label: "Announcement", icon: Megaphone },
@@ -33,6 +39,7 @@ const POST_TYPES = [
 ];
 
 const CreatePostScreen = () => {
+  const insets = useSafeAreaInsets();
   const [isExpanded, setIsExpanded] = useState(true);
   const [postType, setPostType] = useState("anonymous_feed");
   const [loading, setLoading] = useState(false);
@@ -44,12 +51,10 @@ const CreatePostScreen = () => {
     locationName: "",
     eventDate: "",
     source: "",
-    coords: { lat: null, long: null },
+    coords: { lat: 0, long: 0 },
   });
 
-  const toggleAccordion = () => {
-    setIsExpanded(!isExpanded);
-  };
+  const toggleAccordion = () => setIsExpanded(!isExpanded);
 
   const handleSelectType = (id: string) => {
     setPostType(id);
@@ -62,58 +67,83 @@ const CreatePostScreen = () => {
   };
 
   const renderMediaActions = (allowCamera: boolean) => (
-    <View style={styles.mediaRow}>
-      <TouchableOpacity style={styles.mediaButton} activeOpacity={0.8}>
+    <View className="flex-row gap-3 mb-6 mt-2.5">
+      <TouchableOpacity
+        className="flex-1 h-[50px] bg-[#121212] rounded-xl border border-[#333] flex-row items-center justify-center gap-2"
+        activeOpacity={0.8}
+      >
         <ImageIcon color={COLORS.light} size={20} />
-        <Text style={styles.mediaText}>Gallery</Text>
+        <Text className="text-white font-semibold">Gallery</Text>
       </TouchableOpacity>
+
       {allowCamera && (
-        <TouchableOpacity style={styles.mediaButton} activeOpacity={0.8}>
+        <TouchableOpacity
+          className="flex-1 h-[50px] bg-[#121212] rounded-xl border border-[#333] flex-row items-center justify-center gap-2"
+          activeOpacity={0.8}
+        >
           <Camera color={COLORS.light} size={20} />
-          <Text style={styles.mediaText}>Camera</Text>
+          <Text className="text-white font-semibold">Camera</Text>
         </TouchableOpacity>
       )}
     </View>
   );
 
+  const snapPoints = useMemo(() => ["25%", "50%", "70%", "90%"], []);
+  const sheetRef = useRef<BottomSheet>(null);
+  const onOpenSheet = () => {
+    sheetRef.current?.snapToIndex(2);
+  };
+  const renderBackdrop = useCallback(
+    (props: any) => (
+      <BottomSheetBackdrop
+        {...props}
+        appearsOnIndex={0}
+        disappearsOnIndex={-1}
+        opacity={0.7}
+      />
+    ),
+    [],
+  );
+
   return (
-    <SafeAreaView style={styles.container}>
+    <View className="flex-1 bg-black">
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={{ flex: 1 }}
+        className="flex-1"
       >
         <ScrollView
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={{
+            flexGrow: 1,
+            paddingTop: insets.top + 10,
+            paddingBottom: insets.bottom + 40,
+            paddingHorizontal: 18,
+          }}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-          {/* --- TOP HEADER WITH PROFILE --- */}
-          <View style={styles.topRow}>
-            <Text style={styles.mainHeader}>New Post</Text>
-            <TouchableOpacity style={styles.profileCircle} activeOpacity={0.7}>
+          {/* --- TOP HEADER --- */}
+          <View className="flex-row justify-between items-center mb-6 mt-2.5 border-b-[0.5px] border-[#333] pb-4">
+            <Text className="text-white text-4xl font-[800]">New Post</Text>
+            <TouchableOpacity
+              className="w-11 h-11 rounded-full bg-[#1A1A1A] justify-center items-center border border-[#333]"
+              activeOpacity={0.7}
+            >
               <User color="white" size={24} />
             </TouchableOpacity>
           </View>
 
-          <View style={{ marginBottom: 20 }}>
-            <Text style={{ fontSize: 18, fontWeight: "500", color: "white" }}>
-              Posting as{" "}
-              <Text style={{ color: COLORS.accent, fontWeight: "800" }}>
-                Shinny Squirrel
-              </Text>
-            </Text>
-          </View>
-
-          {/* --- COLLAPSIBLE SELECTOR --- */}
-          <View style={styles.accordionContainer}>
+          {/* --- ACCORDION SELECTOR --- */}
+          <View className="bg-[#121212] rounded-2xl border border-[#222] overflow-hidden mb-6">
             <TouchableOpacity
               activeOpacity={0.7}
-              style={styles.accordionHeader}
+              className="flex-row justify-between items-center p-4"
               onPress={toggleAccordion}
             >
-              <View style={styles.headerLeft}>
-                <Text style={styles.labelTitle}>POST TYPE</Text>
-                <Text style={styles.selectedTypeText}>
+              <View className="gap-1">
+                <Text className="text-[10px] font-bold tracking-widest uppercase text-white/50">
+                  POST TYPE
+                </Text>
+                <Text className="text-white text-lg font-bold">
                   {POST_TYPES.find((t) => t.id === postType)?.label}
                 </Text>
               </View>
@@ -125,36 +155,33 @@ const CreatePostScreen = () => {
             </TouchableOpacity>
 
             {isExpanded && (
-              <View style={styles.optionsGrid}>
-                {POST_TYPES.map((item) => (
-                  <TouchableOpacity
-                    key={item.id}
-                    style={[
-                      styles.optionCard,
-                      postType === item.id && styles.activeOption,
-                    ]}
-                    onPress={() => handleSelectType(item.id)}
-                  >
-                    <item.icon
-                      color={postType === item.id ? "black" : COLORS.light}
-                      size={22}
-                    />
-                    <Text
-                      style={[
-                        styles.optionLabel,
-                        postType === item.id && { color: "black" },
-                      ]}
+              <View className="flex-row flex-wrap p-3 gap-2 border-t border-[#222]">
+                {POST_TYPES.map((item) => {
+                  const isActive = postType === item.id;
+                  return (
+                    <TouchableOpacity
+                      key={item.id}
+                      className={`flex-1 min-w-[45%] p-4 rounded-xl items-center gap-2 ${isActive ? "bg-white" : "bg-[#1A1A1A]"}`}
+                      onPress={() => handleSelectType(item.id)}
                     >
-                      {item.label}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
+                      <item.icon
+                        color={isActive ? "black" : COLORS.light}
+                        size={22}
+                      />
+                      <Text
+                        className={`text-[12px] font-semibold ${isActive ? "text-black" : "text-white"}`}
+                      >
+                        {item.label}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
               </View>
             )}
           </View>
 
-          {/* --- DYNAMIC FIELDS --- */}
-          <View style={styles.formContainer}>
+          {/* --- FORM FIELDS --- */}
+          <View className="gap-1">
             <InputField
               label="Title"
               placeholder="What's happening?"
@@ -167,12 +194,11 @@ const CreatePostScreen = () => {
               placeholder="Provide more details..."
               multiline
               numberOfLines={4}
-              style={styles.textArea}
+              style={{ height: 100, textAlignVertical: "top", paddingTop: 12 }}
               value={form.desc}
               onChangeText={(v) => setForm({ ...form, desc: v })}
             />
 
-            {/* ANNOUNCEMENT SPECIFIC */}
             {postType === "announcement" && (
               <InputField
                 label="Source"
@@ -214,23 +240,24 @@ const CreatePostScreen = () => {
                   value={form.locationName}
                   onChangeText={(v) => setForm({ ...form, locationName: v })}
                 />
-                <View style={styles.eventLocationBox}>
-                  <Text style={styles.innerLabel}>
+                <View className="bg-[#121212] p-4 rounded-xl border border-[#333] my-3">
+                  <Text className="text-white text-[12px] font-bold mb-3 uppercase">
                     LOCATION COORDINATES (GPS)
                   </Text>
                   <TouchableOpacity
-                    style={styles.mapTrigger}
+                    className="h-14 bg-black rounded-lg flex-row items-center px-4 gap-3 border border-[#222]"
                     activeOpacity={0.8}
+                    onPress={onOpenSheet}
                   >
                     <MapPin color={COLORS.gray} size={20} />
-                    <Text style={styles.mapTriggerText}>
+                    <Text className="text-gray text-[14px]">
                       {form.coords.lat
                         ? `${form.coords.lat}, ${form.coords.long}`
                         : "Open Map to set location"}
                     </Text>
                   </TouchableOpacity>
-                  <Button style={styles.locationButton}>
-                    <Text style={styles.locationButtonText}>
+                  <Button style={{ backgroundColor: "#1A1A1A", marginTop: 12 }}>
+                    <Text className="text-white font-semibold">
                       Use Current Location
                     </Text>
                   </Button>
@@ -242,134 +269,89 @@ const CreatePostScreen = () => {
             {(postType === "announcement" || postType === "anonymous_feed") &&
               renderMediaActions(false)}
 
-            <Button
-              loading={loading}
-              onPress={handlePost}
-              style={styles.postButton}
-            >
-              <Text style={styles.buttonText}>Publish Post</Text>
+            <Button loading={loading} onPress={handlePost} className="mt-2.5">
+              <Text className="text-lg font-bold text-black">Publish Post</Text>
             </Button>
           </View>
-
-          <View style={{ height: 80 }} />
         </ScrollView>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+
+      <BottomSheet
+        index={-1}
+        ref={sheetRef}
+        snapPoints={snapPoints}
+        enablePanDownToClose={true}
+        backdropComponent={renderBackdrop}
+        backgroundStyle={{ backgroundColor: "#111" }}
+        handleIndicatorStyle={{ backgroundColor: "#fff" }}
+      >
+        <BottomSheetView style={{ flex: 1, paddingHorizontal: 10 }}>
+          <View className="flex-row items-center justify-between px-2 my-2">
+            <Text className="text-xl font-bold tracking-wide text-light">
+              Select the location
+            </Text>
+            <TouchableOpacity
+              onPress={() => sheetRef.current?.close()}
+              className="size-8 bg-dark-2 border-[0.7px] border-dark-1 rounded-full items-center justify-center"
+            >
+              <X size={17} color={"white"} />
+            </TouchableOpacity>
+          </View>
+
+          {/* MAP */}
+          <View className="w-full items-center mt-3">
+            <MapView
+              mapType="hybrid"
+              initialRegion={iutRegion}
+              onLongPress={(e) => {
+                const { latitude, longitude } = e.nativeEvent.coordinate;
+
+                setForm((prev) => ({
+                  ...prev,
+                  coords: {
+                    lat: latitude,
+                    long: longitude,
+                  },
+                }));
+              }}
+              style={{ height: 300, width: "97%", borderRadius: 20 }}
+            />
+          </View>
+
+          {/* COORDINATES */}
+          <View className="flex mt-8">
+            <Text className="text-lg font-bold text-light ml-1 mb-3">
+              Selected coordinates
+            </Text>
+
+            <View className="px-2 mt-3">
+              <Text className="font-semibold text-xs text-light uppercase tracking-widest mb-2">
+                Latitute
+              </Text>
+
+              <View className="flex flex-row items-center justify-start h-[50px] bg-[#121212] border border-[#333] rounded-lg px-[10px]">
+                <Text className="text-md text-light tracking-widest">
+                  {form.coords.lat || "0.00"}
+                </Text>
+              </View>
+            </View>
+
+            <View className="px-2 mt-6">
+              <Text className="font-semibold text-xs text-light uppercase tracking-widest mb-2">
+                longitude
+              </Text>
+
+              <View className="flex flex-row items-center justify-start h-[50px] bg-[#121212] border border-[#333] rounded-lg px-[10px]">
+                <Text className="text-md text-light tracking-widest">
+                  {form.coords.long || "0.00"}
+                </Text>
+              </View>
+            </View>
+          </View>
+        </BottomSheetView>
+      </BottomSheet>
+    </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "black" },
-  scrollContent: { paddingHorizontal: 18, paddingTop: 10 },
-  topRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 24,
-    marginTop: 10,
-  },
-  mainHeader: {
-    color: "white",
-    fontSize: 32,
-    fontWeight: "800",
-  },
-  profileCircle: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: "#1A1A1A",
-    justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: "#333",
-  },
-  accordionContainer: {
-    backgroundColor: "#121212",
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: "#222",
-    overflow: "hidden",
-    marginBottom: 24,
-  },
-  accordionHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 16,
-  },
-  headerLeft: { gap: 4 },
-  labelTitle: {
-    color: COLORS.gray,
-    fontSize: 10,
-    fontWeight: "700",
-    letterSpacing: 1,
-  },
-  selectedTypeText: { color: COLORS.light, fontSize: 18, fontWeight: "700" },
-  optionsGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    padding: 12,
-    gap: 8,
-    borderTopWidth: 1,
-    borderTopColor: "#222",
-  },
-  optionCard: {
-    flex: 1,
-    minWidth: "45%",
-    backgroundColor: "#1A1A1A",
-    padding: 16,
-    borderRadius: 12,
-    alignItems: "center",
-    gap: 8,
-  },
-  activeOption: { backgroundColor: COLORS.light },
-  optionLabel: { color: COLORS.light, fontSize: 12, fontWeight: "600" },
-  formContainer: { gap: 4 },
-  textArea: { height: 100, textAlignVertical: "top", paddingTop: 12 },
-  mediaRow: { flexDirection: "row", gap: 12, marginBottom: 24, marginTop: 10 },
-  mediaButton: {
-    flex: 1,
-    height: 50,
-    backgroundColor: "#121212",
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: "#333",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-  },
-  mediaText: { color: COLORS.light, fontWeight: "600" },
-  eventLocationBox: {
-    backgroundColor: "#121212",
-    padding: 16,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: "#333",
-    marginVertical: 12,
-  },
-  innerLabel: {
-    color: COLORS.light,
-    fontSize: 12,
-    fontWeight: "700",
-    marginBottom: 12,
-  },
-  mapTrigger: {
-    height: 56,
-    backgroundColor: "#000",
-    borderRadius: 8,
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 16,
-    gap: 12,
-    borderWidth: 1,
-    borderColor: "#222",
-  },
-  mapTriggerText: { color: COLORS.gray, fontSize: 14 },
-  locationButton: { marginTop: 12, backgroundColor: "#1A1A1A" },
-  locationButtonText: { color: COLORS.light, fontWeight: "600" },
-  postButton: { marginTop: 10 },
-  buttonText: { fontSize: 18, fontWeight: "700", color: "black" },
-});
 
 export default CreatePostScreen;

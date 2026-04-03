@@ -1,0 +1,17 @@
+{
+  "createAccount": "Créer un compte.",
+  "subHeader": "Rejoignez le réseau national des campus dès aujourd'hui.",
+  "emailLabel": "Email",
+  "passwordLabel": "Mot de passe",
+  "getStarted": "Commencer",
+  "mailNotice": "Un lien de vérification sera envoyé à votre email.",
+  "alreadyHaveAccount": "Vous avez déjà un compte ? ",
+  "signIn": "Se connecter",
+  "mfa": {
+    "header": "Vérifier l'Email.",
+    "subHeader": "Nous avons envoyé un code de vérification OTP à ",
+    "inputLabel": "Code de vérification",
+    "verifyButton": "Vérifier le compte",
+    "resendCode": "Renvoyer le code"
+  }
+}

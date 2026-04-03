@@ -1,0 +1,8 @@
+{
+  "welcome": "Welcome",
+  "guest": "Guest",
+  "tabs": {
+    "map": "Campus Map",
+    "events": "Campus Events"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "welcomeBack": "Bon retour.",
+  "subHeader": "Connectez-vous pour retrouver l'ambiance du campus",
+  "emailLabel": "Email",
+  "emailPlaceholder": "jeandupont@gmail.com",
+  "passwordLabel": "Mot de passe",
+  "signInButton": "Se connecter",
+  "mailNotice": "Un lien de vérification pourrait être envoyé à votre email.",
+  "noAccount": "Vous n'avez pas de compte ? ",
+  "signUp": "S'inscrire",
+  "mfa": {
+    "header": "Vérifier l'Email.",
+    "subHeader": "Nous avons envoyé un code de vérification OTP à ",
+    "inputLabel": "Code de vérification",
+    "inputPlaceholder": "000000",
+    "verifyButton": "Vérifier le compte"
+  }
+}

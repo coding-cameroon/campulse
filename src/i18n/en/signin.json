@@ -1,0 +1,18 @@
+{
+  "welcomeBack": "Welcome Back.",
+  "subHeader": "Sign in to continue to your campus vibes",
+  "emailLabel": "Email",
+  "emailPlaceholder": "johndoe@gmail.com",
+  "passwordLabel": "Password",
+  "signInButton": "Sign In",
+  "mailNotice": "A verification link may be sent to your email.",
+  "noAccount": "Not having an account? ",
+  "signUp": "Sign Up",
+  "mfa": {
+    "header": "Verify Email.",
+    "subHeader": "We sent an OTP verification code to ",
+    "inputLabel": "Verification Code",
+    "inputPlaceholder": "000000",
+    "verifyButton": "Verify Account"
+  }
+}

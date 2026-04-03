@@ -1,0 +1,12 @@
+{
+  "title": "Le Mur",
+  "searchPlaceholder": "Que cherchez-vous?",
+  "banner": {
+    "anonymous": "Anonyme",
+    "ephemeral": "Éphémère",
+    "expiry": "24 heures"
+  },
+  "status": {
+    "noPosts": "Le mur est vide..."
+  }
+}

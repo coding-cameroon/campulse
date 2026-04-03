@@ -1,0 +1,10 @@
+{
+  "welcome": "Welcome to One.",
+  "securityCheck": "We need to proceed with a quick security check.",
+  "emailPlaceholder": "name@university.edu",
+  "continue": "Continue",
+  "errors": {
+    "emptyEmail": "Provide an email to continue",
+    "unauthorized": "This email is not authorized."
+  }
+}

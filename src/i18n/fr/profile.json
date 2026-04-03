@@ -1,0 +1,46 @@
+{
+  "common": {
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "saveChanges": "Enregistrer les modifications"
+  },
+  "profile": {
+    "accountDetails": "Détails du compte",
+    "username": "Nom d'utilisateur",
+    "userRole": "Rôle de l'utilisateur",
+    "roles": {
+      "student": "Étudiant",
+      "guest": "Invité"
+    },
+    "editProfile": {
+      "title": "Modifier le profil",
+      "updateInfo": "Mettre à jour les informations",
+      "profileImage": "Image de profil",
+      "coverImage": "Image de couverture",
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "placeholders": {
+        "firstName": "Entrez votre prénom",
+        "lastName": "Entrez votre nom"
+      }
+    }
+  },
+  "preferences": {
+    "title": "Préférences",
+    "language": "Langue",
+    "languages": {
+      "en": "Anglais",
+      "fr": "Français"
+    },
+    "signOut": "Se déconnecter",
+    "signOutConfirm": {
+      "title": "Se déconnecter ?",
+      "description": "Êtes-vous sûr de vouloir vous déconnecter de votre compte?"
+    }
+  },
+  "content": {
+    "title": "Contenu",
+    "myPosts": "Mes publications",
+    "noPosts": "Aucune publication trouvée"
+  }
+}

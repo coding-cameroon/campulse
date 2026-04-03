@@ -1,0 +1,11 @@
+{
+  "title": "Objets Perdus",
+  "searchPlaceholder": "Recherche d'un objet perdu...",
+  "banner": {
+    "trackItems": "Suivre les objets",
+    "expiryNotice": "Suppression auto après 7 jours"
+  },
+  "status": {
+    "empty": "Aucun objet trouvé"
+  }
+}

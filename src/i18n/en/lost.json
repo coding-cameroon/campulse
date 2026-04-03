@@ -1,0 +1,11 @@
+{
+  "title": "Lost & Found",
+  "searchPlaceholder": "Looking for lost item...",
+  "banner": {
+    "trackItems": "Track Items",
+    "expiryNotice": "Auto-deletes in 7 days"
+  },
+  "status": {
+    "empty": "No items found"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "title": "The Wall",
+  "searchPlaceholder": "What are you looking for?",
+  "banner": {
+    "anonymous": "Anonymous",
+    "ephemeral": "Ephemeral",
+    "expiry": "24 hours"
+  },
+  "status": {
+    "noPosts": "The wall is empty..."
+  }
+}

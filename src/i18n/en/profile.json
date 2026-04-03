@@ -1,0 +1,46 @@
+{
+  "common": {
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "saveChanges": "Save Changes"
+  },
+  "profile": {
+    "accountDetails": "Account Details",
+    "username": "Username",
+    "userRole": "User Role",
+    "roles": {
+      "student": "Student",
+      "guest": "Guest"
+    },
+    "editProfile": {
+      "title": "Edit Profile",
+      "updateInfo": "Update Information",
+      "profileImage": "Profile Image",
+      "coverImage": "Cover Image",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "placeholders": {
+        "firstName": "Enter first name",
+        "lastName": "Enter last name"
+      }
+    }
+  },
+  "preferences": {
+    "title": "Preferences",
+    "language": "Language",
+    "languages": {
+      "en": "English",
+      "fr": "French"
+    },
+    "signOut": "Sign Out",
+    "signOutConfirm": {
+      "title": "Sign Out?",
+      "description": "Are you sure you want to log out of your account?"
+    }
+  },
+  "content": {
+    "title": "Content",
+    "myPosts": "My Posts",
+    "noPosts": "No posts found"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "header": {
+    "location": "IUT Douala",
+    "title": "Events"
+  },
+  "categories": {
+    "All": "All",
+    "Academic": "Academic",
+    "Tech": "Tech",
+    "Social": "Social",
+    "Career": "Career",
+    "Sports": "Sports"
+  },
+  "status": {
+    "noEvents": "No events found in this category."
+  }
+}

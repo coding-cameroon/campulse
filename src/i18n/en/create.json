@@ -1,0 +1,56 @@
+{
+  "header": "New Post",
+  "postType": {
+    "label": "POST TYPE",
+    "announcement": "Announcement",
+    "lostFound": "Lost & Found",
+    "events": "Campus Event",
+    "anonymous": "Anonymous Feed"
+  },
+  "fields": {
+    "title": {
+      "label": "Title",
+      "placeholder": "What's happening?"
+    },
+    "description": {
+      "label": "Description",
+      "placeholder": "Provide more details..."
+    },
+    "source": {
+      "label": "Source",
+      "placeholder": "e.g. Student Union, Registrar's Office"
+    },
+    "contact": {
+      "label": "Contact Details",
+      "placeholder": "Phone or Social handle"
+    },
+    "location": {
+      "label": "Last Seen Location",
+      "placeholder": "e.g. Faculty of Science"
+    },
+    "eventDate": {
+      "label": "Event Date & Time",
+      "placeholder": "e.g. Friday, 24th March at 2 PM"
+    },
+    "venue": {
+      "label": "Venue / Venue Name",
+      "placeholder": "e.g. Main Auditorium"
+    }
+  },
+  "media": {
+    "gallery": "Gallery",
+    "camera": "Camera"
+  },
+  "location": {
+    "gpsLabel": "LOCATION COORDINATES (GPS)",
+    "openMap": "Open Map to set location",
+    "useCurrent": "Use Current Location",
+    "sheetTitle": "Select the location",
+    "selectedCoords": "Selected coordinates",
+    "latitude": "Latitude",
+    "longitude": "Longitude"
+  },
+  "actions": {
+    "publish": "Publish Post"
+  }
+}

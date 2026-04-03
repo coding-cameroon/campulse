@@ -1,0 +1,10 @@
+{
+  "welcome": "Bienvenue sur One.",
+  "securityCheck": "Nous devons effectuer un rapide contrôle de sécurité.",
+  "emailPlaceholder": "nom@university.edu",
+  "continue": "Continuer",
+  "errors": {
+    "emptyEmail": "Veuillez saisir un e-mail pour continuer",
+    "unauthorized": "Cet e-mail n'est pas autorisé."
+  }
+}

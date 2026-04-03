@@ -4,6 +4,7 @@ import InputField from "@/components/InputField";
 import LostAndFoundCard from "@/components/LostFoundCard";
 import { COLORS } from "@/utils/colors";
 import BottomSheet from "@gorhom/bottom-sheet";
+import { router } from "expo-router";
 import { Search, X } from "lucide-react-native";
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
@@ -58,7 +59,10 @@ export default function LostFoundScreen() {
         {/* FLOATING INTERACTIVE BAR */}
         <View className="flex-row items-center justify-between bg-white/10 rounded-full px-2 py-2 border border-white/10">
           {/* profile */}
-          <TouchableOpacity activeOpacity={0.7}>
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={() => router.push("/user/profile")}
+          >
             <Image
               source={require("$/images/icon.png")}
               className="w-10 h-10 rounded-full border-[1.5px] border-[#333]"

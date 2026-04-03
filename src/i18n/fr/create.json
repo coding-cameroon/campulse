@@ -1,0 +1,56 @@
+{
+  "header": "Nouveau Post",
+  "postType": {
+    "label": "TYPE DE POST",
+    "announcement": "Annonce",
+    "lostFound": "Objets Perdus",
+    "events": "Événement Campus",
+    "anonymous": "Fil Anonyme"
+  },
+  "fields": {
+    "title": {
+      "label": "Titre",
+      "placeholder": "Que se passe-t-il ?"
+    },
+    "description": {
+      "label": "Description",
+      "placeholder": "Fournir plus de détails..."
+    },
+    "source": {
+      "label": "Source",
+      "placeholder": "ex: Union des Étudiants, Scolarité"
+    },
+    "contact": {
+      "label": "Coordonnées",
+      "placeholder": "Téléphone ou réseau social"
+    },
+    "location": {
+      "label": "Dernier lieu vu",
+      "placeholder": "ex: Faculté des Sciences"
+    },
+    "eventDate": {
+      "label": "Date et Heure de l'événement",
+      "placeholder": "ex: Vendredi 24 mars à 14h"
+    },
+    "venue": {
+      "label": "Lieu / Nom de la salle",
+      "placeholder": "ex: Amphi d'Honneur"
+    }
+  },
+  "media": {
+    "gallery": "Galerie",
+    "camera": "Caméra"
+  },
+  "location": {
+    "gpsLabel": "COORDONNÉES GPS",
+    "openMap": "Ouvrir la carte pour définir le lieu",
+    "useCurrent": "Utiliser ma position actuelle",
+    "sheetTitle": "Sélectionner le lieu",
+    "selectedCoords": "Coordonnées sélectionnées",
+    "latitude": "Latitude",
+    "longitude": "Longitude"
+  },
+  "actions": {
+    "publish": "Publier le Post"
+  }
+}
