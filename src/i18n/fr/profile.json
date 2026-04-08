@@ -22,7 +22,8 @@
       "placeholders": {
         "firstName": "Entrez votre prénom",
         "lastName": "Entrez votre nom"
-      }
+      },
+      "save": "Enregistrer les modifications"
     }
   },
   "preferences": {
@@ -34,8 +35,9 @@
     },
     "signOut": "Se déconnecter",
     "signOutConfirm": {
-      "title": "Se déconnecter ?",
-      "description": "Êtes-vous sûr de vouloir vous déconnecter de votre compte?"
+      "title": "Déconnexion",
+      "description": "Êtes-vous sûr de vouloir vous déconnecter de votre compte?",
+      "cancel": "Annuler"
     }
   },
   "content": {

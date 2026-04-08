@@ -93,3 +93,52 @@ export interface BottomSheetProps {
 export interface PostCardProps {
   post: Post;
 }
+
+// ACTUAL INTERFACES
+export interface User {
+  clerkId: string;
+  email: string;
+  anonymousAvatarUrl: string;
+  role?: "student" | "admin";
+  id?: string;
+  firstName?: string | null;
+  lastName?: string | null;
+  realAvatarUrl?: string | null;
+  coverAvatarUrl?: string | null;
+  realAvatarUrlId?: string | null;
+  coverAvatarUrlId?: string | null;
+  isActive?: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface Post {
+  body: string;
+  authorId: string;
+  category: "feed" | "event" | "lost_found";
+  id?: string;
+  realAvatarUrl?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+  status?: "active" | "expired" | "removed";
+  title?: string | null;
+  imageUrls?: string[] | null;
+  imageFileIds?: string[] | null;
+  anonName?: string | null;
+  anonAvatarUrl?: string | null;
+  realName?: string | null;
+  collectAt?: string | null;
+  lastSeenAt: string | null;
+  phoneNumber: number | null;
+  itemStatus: "lost" | "found" | null;
+  eventLocation: string | null;
+  eventStartAt: Date | null;
+  eventEndAt: Date | null;
+  mapCoordinates: {
+    lat: number;
+    lng: number;
+  } | null;
+  expiresAt: string;
+  reactionCount: number;
+  commentCount: number;
+}

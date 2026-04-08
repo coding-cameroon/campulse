@@ -4,6 +4,7 @@ import { COLORS } from "@/utils/colors";
 import { useUser } from "@clerk/expo";
 import { router } from "expo-router";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Dimensions,
   Image,
@@ -18,6 +19,8 @@ export default function CampusMap() {
   const { user } = useUser();
   const insets = useSafeAreaInsets();
   const [activeTab, setActiveTab] = useState<"map" | "events">("map");
+
+  const { t, i18n } = useTranslation("home");
 
   const getDisplayName = () => {
     if (user?.firstName) return user.firstName;
@@ -47,7 +50,7 @@ export default function CampusMap() {
         {/* STATIC TITLE */}
         <View className="px-2 py-2 mb-1">
           <Text className="text-gray uppercase text-[14px] font-[900] tracking-tighter">
-            Welcome
+            {t("welcome")}
           </Text>
           <Text className="text-white text-[24px] font-[900] tracking-wider -mt-1">
             {getDisplayName()}
@@ -90,7 +93,7 @@ export default function CampusMap() {
                   activeTab === "map" ? "text-black" : "text-white/60"
                 }`}
               >
-                Campus Map
+                {t("tabs.map")}
               </Text>
             </TouchableOpacity>
 
@@ -110,7 +113,7 @@ export default function CampusMap() {
                   activeTab === "events" ? "text-black" : "text-white/60"
                 }`}
               >
-                Campus Events
+                {t("tabs.events")}
               </Text>
             </TouchableOpacity>
           </View>

@@ -1,6 +1,6 @@
 {
   "title": "Le Mur",
-  "searchPlaceholder": "Que cherchez-vous?",
+  "searchPlaceholder": "Que cherchez-vous ?",
   "banner": {
     "anonymous": "Anonyme",
     "ephemeral": "Éphémère",
@@ -8,5 +8,16 @@
   },
   "status": {
     "noPosts": "Le mur est vide..."
+  },
+  "card": {
+    "likes": "J'aime",
+    "comments": "Commentaires",
+    "timeLeft": "Temps restant",
+    "justNow": "À l'instant"
+  },
+  "comments": {
+    "header": "Commentaires",
+    "placeholder": "Écrire un commentaire...",
+    "empty": "Aucun commentaire pour le moment."
   }
 }

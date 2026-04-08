@@ -7,5 +7,6 @@
   },
   "status": {
     "empty": "Aucun objet trouvé"
-  }
+  },
+  "foundAt": "Trouvé à"
 }

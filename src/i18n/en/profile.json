@@ -22,7 +22,8 @@
       "placeholders": {
         "firstName": "Enter first name",
         "lastName": "Enter last name"
-      }
+      },
+      "save": "Save Changes"
     }
   },
   "preferences": {
@@ -35,7 +36,8 @@
     "signOut": "Sign Out",
     "signOutConfirm": {
       "title": "Sign Out?",
-      "description": "Are you sure you want to log out of your account?"
+      "description": "Are you sure you want to log out of your account?",
+      "cancel": "Cancel"
     }
   },
   "content": {

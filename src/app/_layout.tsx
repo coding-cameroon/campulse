@@ -1,7 +1,10 @@
+import { queryClient } from "@/lib/queryClient";
 import { ClerkLoaded, ClerkProvider, useAuth } from "@clerk/expo";
 import { tokenCache } from "@clerk/expo/token-cache";
+import { QueryClientProvider } from "@tanstack/react-query"; // ! install tanstack
 import { Stack } from "expo-router";
 
+import "@/lib/i18n";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "../../global.css";
 
@@ -31,7 +34,9 @@ export default function RootLayout() {
     <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
       <ClerkLoaded>
         <GestureHandlerRootView>
-          <RootStack />
+          <QueryClientProvider client={queryClient}>
+            <RootStack />
+          </QueryClientProvider>
         </GestureHandlerRootView>
       </ClerkLoaded>
     </ClerkProvider>

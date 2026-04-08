@@ -7,6 +7,7 @@ import { COLORS } from "@/utils/colors";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { Search, X } from "lucide-react-native";
 import React, { useCallback, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -15,6 +16,8 @@ export default function PostScreen() {
   const [searchText, setSearchText] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
+
+  const { t } = useTranslation("wall");
 
   const sheetRef = useRef<BottomSheet>(null);
 
@@ -49,7 +52,7 @@ export default function PostScreen() {
       {/* STATIC TITLE */}
       <View className="px-2 py-2">
         <Text className="text-white text-[44px] font-[900] tracking-tighter">
-          The Wall
+          {t("title")}
         </Text>
       </View>
 
@@ -74,14 +77,15 @@ export default function PostScreen() {
                 numberOfLines={1}
                 className="text-black text-sm font-extrabold text-center"
               >
-                Anonymous • Ephemeral • 24 hours
+                {t("banner.anonymous")} • {t("banner.ephemeral")} •{" "}
+                {t("banner.expiry")}
               </Text>
             </View>
           ) : (
             <InputField
               autoFocus
               onChangeText={setSearchText}
-              placeholder="What are you looking for?"
+              placeholder={t("searchPlaceholder") as string}
               style={{ borderRadius: 60, height: 37, marginBottom: -24 }}
             />
           )}

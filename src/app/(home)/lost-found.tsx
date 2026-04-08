@@ -7,6 +7,7 @@ import BottomSheet from "@gorhom/bottom-sheet";
 import { router } from "expo-router";
 import { Search, X } from "lucide-react-native";
 import React, { useCallback, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -15,6 +16,7 @@ export default function LostFoundScreen() {
   const [isSearching, setIsSearching] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [selectedItemId, setSelectedItemId] = useState("");
+  const { t } = useTranslation("lost");
 
   const filteredPosts = dummyLostAndFound.filter(
     (post) =>
@@ -35,7 +37,7 @@ export default function LostFoundScreen() {
   const handleOpenSheet = useCallback((id: string) => {
     setSelectedItemId(id);
 
-    sheetRef.current?.snapToIndex(2);
+    sheetRef.current?.snapToIndex(0);
   }, []);
 
   const handleSubmit = (text: string) => {
@@ -52,7 +54,7 @@ export default function LostFoundScreen() {
         {/* STATIC TITLE */}
         <View className="px-2 py-2">
           <Text className="text-white text-[44px] font-[900] tracking-tighter">
-            Lost & Found
+            {t("title")}
           </Text>
         </View>
 
@@ -80,14 +82,14 @@ export default function LostFoundScreen() {
                   numberOfLines={1}
                   className="text-black text-sm font-extrabold text-center"
                 >
-                  Track Items • Auto-deletes in 7 days
+                  {t("banner.trackItems")} • {t("banner.expiryNotice")}
                 </Text>
               </View>
             ) : (
               <InputField
                 autoFocus
                 onChangeText={setSearchText}
-                placeholder="Looking for lost item..."
+                placeholder={t("searchPlaceholder")}
                 style={{ borderRadius: 60, height: 37, marginBottom: -24 }}
               />
             )}
@@ -122,7 +124,6 @@ export default function LostFoundScreen() {
           />
         )}
         showsVerticalScrollIndicator={false}
-        /* Adjusted paddingTop to match the dynamic header height */
         contentContainerStyle={{
           paddingTop: insets.top + 160,
           paddingBottom: 5,

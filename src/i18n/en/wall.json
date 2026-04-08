@@ -8,5 +8,16 @@
   },
   "status": {
     "noPosts": "The wall is empty..."
+  },
+  "card": {
+    "likes": "Likes",
+    "comments": "Comments",
+    "timeLeft": "Time left",
+    "justNow": "Just now"
+  },
+  "comments": {
+    "header": "Comments",
+    "placeholder": "Write a comment...",
+    "empty": "No comments yet."
   }
 }

@@ -6,17 +6,16 @@ import BottomSheet, {
 } from "@gorhom/bottom-sheet";
 import { ArrowUp, MessageCircleMore, X } from "lucide-react-native";
 import React, { forwardRef, useCallback, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   Image,
-  StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
 import { Comment } from "../../types/index";
 
-// 1. Define the Props interface
 interface CommentsBottomSheetProps {
   comments: Comment[];
   onSendComment: (text: string) => Promise<void> | void;
@@ -28,7 +27,8 @@ const CommentsBottomSheet = forwardRef<BottomSheet, CommentsBottomSheetProps>(
     const [commentText, setCommentText] = useState<string>("");
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-    const snapPoints = useMemo(() => ["25%", "50%", "75%", "80%"], []);
+    const snapPoints = useMemo(() => ["75%"], []);
+    const { t } = useTranslation("wall");
 
     const handleCloseSheet = useCallback(() => {
       (ref as any).current?.close();
@@ -44,8 +44,7 @@ const CommentsBottomSheet = forwardRef<BottomSheet, CommentsBottomSheetProps>(
     };
 
     const renderComment = useCallback(({ item }: { item: Comment }) => {
-      // You can check if the item.author._id === currentUserId to align right
-      const isMe = false;
+      const isMe = false; // Replace with actual auth logic
 
       return (
         <View
@@ -74,17 +73,17 @@ const CommentsBottomSheet = forwardRef<BottomSheet, CommentsBottomSheetProps>(
                 {item.author.fullName}
               </Text>
             )}
-
             <View
-              style={[
-                styles.bubble,
-                isMe ? styles.bubbleMe : styles.bubbleThem,
-              ]}
+              className={`px-3 py-2 rounded-2xl relative ${
+                isMe
+                  ? "bg-orange-500 rounded-br-sm"
+                  : "bg-zinc-800 rounded-bl-sm"
+              }`}
+              style={isMe ? { backgroundColor: COLORS.accent } : null}
             >
               <Text className="text-white text-[15px] leading-5">
                 {item.content}
               </Text>
-
               <Text className="text-zinc-500 text-[10px] mt-1 self-end">
                 12:45
               </Text>
@@ -111,14 +110,16 @@ const CommentsBottomSheet = forwardRef<BottomSheet, CommentsBottomSheetProps>(
         ref={ref}
         index={-1}
         snapPoints={snapPoints}
-        enablePanDownToClose={true}
+        enablePanDownToClose={false}
+        enableHandlePanningGesture={false}
+        enableContentPanningGesture={false}
         backdropComponent={renderBackdrop}
         keyboardBehavior="extend"
         keyboardBlurBehavior="restore"
-        backgroundStyle={styles.sheetBackground}
-        handleIndicatorStyle={styles.indicator}
+        backgroundStyle={{ backgroundColor: COLORS["dark-3"], borderRadius: 0 }}
+        handleIndicatorStyle={{ backgroundColor: "#3f3f46", width: 40 }}
       >
-        <View style={styles.contentContainer}>
+        <View className="flex-1">
           {/* HEADER */}
           <View className="flex-row items-center justify-between px-4 pb-4 border-b border-zinc-900">
             <View className="flex-row gap-3 items-center">
@@ -126,9 +127,8 @@ const CommentsBottomSheet = forwardRef<BottomSheet, CommentsBottomSheetProps>(
                 <MessageCircleMore size={20} color="#f97316" />
               </View>
               <Text className="text-lg font-bold text-white">
-                Comments{" "}
                 <Text className="text-zinc-500 font-medium">
-                  ({comments.length})
+                  {comments.length} comment(s)
                 </Text>
               </Text>
             </View>
@@ -145,29 +145,36 @@ const CommentsBottomSheet = forwardRef<BottomSheet, CommentsBottomSheetProps>(
             data={comments}
             keyExtractor={(item: any) => item._id}
             renderItem={renderComment}
-            contentContainerStyle={styles.listContent}
+            contentContainerStyle={{ paddingBottom: 500, paddingTop: 10 }}
             ListEmptyComponent={
               <View className="items-center justify-center pt-20">
                 <Text className="text-zinc-500 text-base">
-                  No comments yet.
+                  No Comments yet.
                 </Text>
               </View>
             }
           />
 
           {/* ABSOLUTE INPUT CONTAINER */}
-          <View style={styles.inputWrapper}>
+          <View
+            className="absolute bottom-20 left-0 right-0 pt-3 pb-8 border-t"
+            style={{
+              backgroundColor: COLORS["dark-3"],
+              borderTopColor: COLORS["dark-2"],
+            }}
+          >
             <View className="flex-row items-center gap-3 px-4">
               <BottomSheetTextInput
-                placeholder="Write a comment..."
+                placeholder={t("comments.placeholder")}
                 placeholderTextColor="#71717a"
-                style={styles.inputField}
+                className="flex-1 bg-zinc-900 border border-zinc-800 rounded-full text-white px-4 py-2 text-[15px]"
                 value={commentText}
                 onChangeText={setCommentText}
               />
               <TouchableOpacity
                 disabled={isSubmitting}
-                style={styles.sendButton}
+                className="rounded-full size-9 items-center justify-center"
+                style={{ backgroundColor: COLORS.accent }}
                 onPress={handlePostComment}
               >
                 {isSubmitting || isLoading ? (
@@ -183,67 +190,5 @@ const CommentsBottomSheet = forwardRef<BottomSheet, CommentsBottomSheetProps>(
     );
   },
 );
-
-const styles = StyleSheet.create({
-  sheetBackground: {
-    borderRadius: 0,
-    backgroundColor: COLORS["dark-3"],
-  },
-  indicator: {
-    backgroundColor: "#3f3f46",
-    width: 40,
-  },
-  contentContainer: {
-    flex: 1,
-  },
-  listContent: {
-    paddingBottom: 100, // Room for the input box
-    paddingTop: 10,
-  },
-  inputWrapper: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    paddingTop: 12,
-    paddingBottom: 30, // Increased for safe area/aesthetic
-    backgroundColor: COLORS["dark-3"],
-    borderTopWidth: 1,
-    borderTopColor: COLORS["dark-2"],
-  },
-  inputField: {
-    flex: 1,
-    backgroundColor: "#121212",
-    borderWidth: 1,
-    borderColor: "#27272a",
-    borderRadius: 24,
-    color: "#fff",
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    fontSize: 15,
-  },
-  sendButton: {
-    borderRadius: 50,
-    width: 35,
-    height: 35,
-    backgroundColor: COLORS.accent,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  bubble: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 20,
-    position: "relative",
-  },
-  bubbleThem: {
-    backgroundColor: "#27272a",
-    borderBottomLeftRadius: 4,
-  },
-  bubbleMe: {
-    backgroundColor: COLORS.accent,
-    borderBottomRightRadius: 4,
-  },
-});
 
 export default CommentsBottomSheet;

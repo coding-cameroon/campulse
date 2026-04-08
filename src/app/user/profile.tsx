@@ -3,6 +3,8 @@ import { COLORS } from "@/utils/colors";
 import { formatDate } from "@/utils/date";
 import { useAuth, useUser } from "@clerk/expo";
 import { Stack, useRouter } from "expo-router";
+import * as SecureStore from "expo-secure-store";
+// import * as Updates from "expo-updates";
 import {
   ArrowLeft,
   Camera,
@@ -19,6 +21,7 @@ import {
   UserRoundPen,
 } from "lucide-react-native";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Dimensions,
   Image,
@@ -34,8 +37,8 @@ import {
 
 const { width } = Dimensions.get("window");
 
-// --- SUB-COMPONENTS ---
-
+// =============================================  COMPONENTS =========================================================
+// ALERT MODAL
 const AlertModal = ({
   visible,
   onClose,
@@ -91,7 +94,9 @@ const AlertModal = ({
             onPress={onClose}
             className="w-full bg-white/5 py-4 rounded-xl items-center border border-white/5"
           >
-            <Text className="text-white font-bold text-base">Cancel</Text>
+            <Text className="text-white font-bold text-base">
+              {/* {t("preferences.signOutConfirm.cancel")} */}Cancel
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -99,6 +104,7 @@ const AlertModal = ({
   </Modal>
 );
 
+// INFOR
 const InfoItem = ({ label, value }: { label: string; value: string }) => (
   <View className="flex-row items-center justify-between py-4">
     <View className="flex-row items-center gap-2.5">
@@ -113,6 +119,7 @@ const InfoItem = ({ label, value }: { label: string; value: string }) => (
   </View>
 );
 
+// EDIT FIELD
 const EditField = ({
   label,
   placeholder,
@@ -309,6 +316,7 @@ export default function ProfileScreen() {
   const router = useRouter();
   const { user } = useUser();
   const { signOut } = useAuth();
+  const { i18n } = useTranslation();
 
   const [isLanguageOpen, setIsLanguageOpen] = useState(false);
   const [isPostsOpen, setIsPostsOpen] = useState(false);
@@ -324,6 +332,27 @@ export default function ProfileScreen() {
     onConfirm: () => {},
   });
 
+  // CHANGE LANG
+  const changeLanguage = async (lang: string) => {
+    await SecureStore.setItemAsync("language", lang);
+
+    i18n.changeLanguage(lang);
+  };
+  const { t } = useTranslation("profile");
+
+  // const onFetchUpdateAsync = async () => {
+  //   try {
+  //     const update = await Updates.checkForUpdateAsync();
+
+  //     if (update.isAvailable) {
+  //       await Updates.fetchUpdateAsync();
+  //       await Updates.reloadAsync();
+  //     }
+  //   } catch (error) {
+  //     alert(`Error fetching latest Expo update: ${error}`);
+  //   }
+  // }
+
   const getDisplayName = () => {
     if (user?.firstName && user?.lastName) return user.fullName;
     const emailHandle = user?.emailAddresses?.[0]?.emailAddress?.split("@")[0];
@@ -338,9 +367,9 @@ export default function ProfileScreen() {
   const initiateSignOut = () => {
     setModalConfig({
       visible: true,
-      title: "Sign Out?",
-      description: "Are you sure you want to log out of your account?",
-      confirmText: "Sign Out",
+      title: t("preferences.signOutConfirm.title"),
+      description: t("preferences.signOutConfirm.description"),
+      confirmText: t("preferences.signOut"),
       onConfirm: async () => {
         try {
           await signOut();
@@ -414,14 +443,20 @@ export default function ProfileScreen() {
           {/* Account Details */}
           <View className="w-full mt-8">
             <Text className="text-white/30 text-[10px] font-black uppercase tracking-[2px] mb-2 px-1">
-              Account Details
+              {t("profile.accountDetails")}
             </Text>
             <View className="w-full rounded-2xl border border-[#1A1A1A] bg-[#0A0A0A] px-5">
-              <InfoItem label="Username" value="@shinny_squirrel" />
+              <InfoItem
+                label={t("profile.username")}
+                value="@shinny_squirrel"
+              />
               <View className="h-[0.5px] bg-[#1A1A1A]" />
               <InfoItem
-                label="User Role"
-                value={(user?.publicMetadata?.role as string) || "Student"}
+                label={t("profile.userRole")}
+                value={
+                  (user?.publicMetadata?.role as string) ||
+                  t("profile.userRole")
+                }
               />
             </View>
           </View>
@@ -429,11 +464,11 @@ export default function ProfileScreen() {
           {/* --- EDIT PROFILE SECTION --- */}
           <View className="w-full mt-8">
             <Text className="text-white/30 text-[10px] font-black uppercase tracking-[2px] mb-2 px-1">
-              Edit Profile
+              {t("profile.editProfile.title")}
             </Text>
             <View className="bg-[#0A0A0A] rounded-2xl px-5 border border-[#1A1A1A]">
               <SettingsItem
-                label="Update Information"
+                label={t("profile.editProfile.updateInfo")}
                 icon={UserRoundPen}
                 isLast={!isEditOpen}
                 isExpanded={isEditOpen}
@@ -445,7 +480,7 @@ export default function ProfileScreen() {
                   <View className="flex-row gap-4">
                     <View className="flex-1">
                       <ProfileImagePicker
-                        label="Profile Image"
+                        label={t("profile.editProfile.profileImage")}
                         imageUri={user?.imageUrl}
                         onPress={() => {}}
                       />
@@ -453,19 +488,21 @@ export default function ProfileScreen() {
                   </View>
 
                   <CoverImagePicker
-                    label="Cover Image"
+                    label={t("profile.editProfile.coverImage")}
                     imageUri="https://tse2.mm.bing.net/th/id/OIP._XuPSkfdjac9iIbQQrJ8sQHaED?w=2500&h=1369&rs=1&pid=ImgDetMain&o=7&rm=3"
                     onPress={() => {}}
                   />
 
                   <EditField
-                    label="First Name"
-                    placeholder="Enter first name"
+                    label={t("profile.editProfile.firstName")}
+                    placeholder={t(
+                      "profile.editProfile.placeholders.firstName",
+                    )}
                     value={user?.firstName || ""}
                   />
                   <EditField
-                    label="Last Name"
-                    placeholder="Enter last name"
+                    label={t("profile.editProfile.lastName")}
+                    placeholder={t("profile.editProfile.placeholders.lastName")}
                     value={user?.lastName || ""}
                   />
 
@@ -474,7 +511,7 @@ export default function ProfileScreen() {
                     className="w-full py-4 rounded-xl items-center mt-4 shadow-lg"
                   >
                     <Text className="text-black font-black uppercase tracking-widest text-xs">
-                      Save Changes
+                      {t("profile.editProfile.save")}
                     </Text>
                   </TouchableOpacity>
                 </View>
@@ -486,11 +523,11 @@ export default function ProfileScreen() {
         {/* 3. SETTINGS & OPTIONS SECTION */}
         <View className="px-5 mt-8">
           <Text className="text-white/30 text-[10px] font-black uppercase tracking-[2px] mb-2 px-1">
-            Preferences
+            {t("preferences.title")}
           </Text>
           <View className="bg-[#0A0A0A] rounded-2xl px-5 border border-[#1A1A1A]">
             <SettingsItem
-              label="Language"
+              label={t("preferences.language")}
               icon={Languages}
               isLast={false}
               value={selectedLanguage}
@@ -502,9 +539,15 @@ export default function ProfileScreen() {
                 {["English", "French"].map((lang) => (
                   <TouchableOpacity
                     key={lang}
-                    onPress={() => {
+                    onPress={async () => {
+                      const lng = lang === "English" ? "en" : "fr";
+
+                      changeLanguage(lng);
+
                       setSelectedLanguage(lang);
                       setIsLanguageOpen(false);
+
+                      // onFetchUpdateAsync()
                     }}
                     className="py-3 flex-row justify-between items-center pr-4"
                   >
@@ -520,8 +563,9 @@ export default function ProfileScreen() {
                 ))}
               </View>
             )}
+
             <SettingsItem
-              label="Sign Out"
+              label={t("preferences.signOut")}
               icon={LogOut}
               isDestructive
               isLast
@@ -534,11 +578,11 @@ export default function ProfileScreen() {
         {/* 4. CONTENT SECTION */}
         <View className="px-5 mt-8">
           <Text className="text-white/30 text-[10px] font-black uppercase tracking-[2px] mb-2 px-1">
-            Content
+            {t("content.title")}
           </Text>
           <View className="bg-[#0A0A0A] rounded-2xl px-5 border border-[#1A1A1A]">
             <SettingsItem
-              label="My Posts"
+              label={t("content.myPosts")}
               icon={LayoutList}
               isLast={false}
               value={`${myPosts.length}`}
@@ -561,7 +605,7 @@ export default function ProfileScreen() {
                   <View className="py-8 flex-row gap-2 items-center justify-center">
                     <PackageOpen color={"rgb(255 255 255 / 0.3)"} />
                     <Text className="text-white/30 font-bold">
-                      No posts found
+                      {t("content.noPost")}
                     </Text>
                   </View>
                 )}
