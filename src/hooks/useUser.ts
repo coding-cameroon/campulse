@@ -1,5 +1,5 @@
 // src/hooks/useUser.ts
-import { userApi } from "@/app/api/user.api";
+import { userApi } from "@/api/user.api";
 import { useAxios } from "@/lib/axios";
 import { queryKeys } from "@/lib/queryKeys";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"; // ! install tanstack
@@ -13,6 +13,7 @@ export const useGetMe = () => {
     queryFn: () => userApi(axios).getMe(),
   });
 };
+
 
 export const useSyncUser = () => {
   const axios = useAxios();

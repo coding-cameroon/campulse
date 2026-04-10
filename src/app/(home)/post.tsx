@@ -39,12 +39,11 @@ export default function PostScreen() {
 
   const filteredPosts = MOCK_POSTS.filter(
     (post) =>
-      post.author.username?.includes(searchText) ||
-      post.content.includes(searchText),
+      post.author.username?.toLowerCase().includes(searchText.toLowerCase()) ||
+      post.content.toLowerCase().includes(searchText.toLowerCase()),
   );
 
   const Header = () => (
-    /* We add padding top based on the device's notch/status bar height */
     <View
       className="absolute top-0 left-0 right-0 z-10 bg-black/90 px-4 pb-4"
       style={{ paddingTop: insets.top + 5 }}

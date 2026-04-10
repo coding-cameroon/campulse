@@ -1,11 +1,12 @@
 import { dummyLostAndFound, MOCK_LOST_FOUND_COMMENTS } from "$/data/lost";
 import CustomBottomSheet from "@/components/CustomBottomSheet";
+import EmptyState from "@/components/EmptyListComponent";
 import InputField from "@/components/InputField";
 import LostAndFoundCard from "@/components/LostFoundCard";
 import { COLORS } from "@/utils/colors";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { router } from "expo-router";
-import { Search, X } from "lucide-react-native";
+import { Ghost, Search, X } from "lucide-react-native";
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
@@ -20,13 +21,13 @@ export default function LostFoundScreen() {
 
   const filteredPosts = dummyLostAndFound.filter(
     (post) =>
-      post.author.username?.includes(searchText) ||
-      post.content.includes(searchText) ||
-      post.title.includes(searchText) ||
-      post.author?.username?.includes(searchText) ||
-      post.author?.fullName?.includes(searchText) ||
-      post.location.includes(searchText) ||
-      post.lastSeenLocation.includes(searchText),
+      post.author.username?.includes(searchText.toLowerCase()) ||
+      post.content.toLowerCase().includes(searchText.toLowerCase()) ||
+      post.title.toLowerCase().includes(searchText.toLowerCase()) ||
+      post.author?.username?.toLowerCase().includes(searchText.toLowerCase()) ||
+      post.author?.fullName?.toLowerCase().includes(searchText.toLowerCase()) ||
+      post.location.toLowerCase().includes(searchText.toLowerCase()) ||
+      post.lastSeenLocation.toLowerCase().includes(searchText.toLowerCase()),
   );
 
   const comments = MOCK_LOST_FOUND_COMMENTS.filter(
@@ -109,7 +110,7 @@ export default function LostFoundScreen() {
         </View>
       </View>
     ),
-    [],
+    [isSearching],
   );
 
   return (
@@ -123,6 +124,23 @@ export default function LostFoundScreen() {
             onPressItem={() => handleOpenSheet(item._id)}
           />
         )}
+        ListEmptyComponent={
+          <EmptyState
+            title={searchText ? "No matches found" : "No posts yet"}
+            description={
+              searchText
+                ? `We couldn't find anything for "${searchText}".`
+                : "Be the first to post something!"
+            }
+            Icon={searchText ? Search : Ghost}
+            showAction={searchText.length > 0}
+            actionText="Clear Search"
+            onAction={() => {
+              setSearchText("");
+              setIsSearching(false);
+            }}
+          />
+        }
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           paddingTop: insets.top + 160,

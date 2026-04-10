@@ -1,6 +1,6 @@
 // src/api/post.api.ts
 import { AxiosInstance } from "axios";
-import { Post } from "../../../types";
+import { Post } from "../../types"
 
 export type GetPostsResponse = {
   data: Post[];

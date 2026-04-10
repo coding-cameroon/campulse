@@ -10,7 +10,6 @@ export const axiosInstance = axios.create({
   },
 });
 
-// Hook to get axios with auth token injected
 export const useAxios = () => {
   const { getToken } = useAuth();
 

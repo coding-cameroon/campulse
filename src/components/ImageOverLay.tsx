@@ -24,7 +24,8 @@ const SimpleImageAlert = ({
         onPress={onClose}
         className="flex-1 bg-black/90 justify-center items-center px-4"
       >
-        <View className="w-full aspect-square max-w-[400px]">
+        {/* Removed aspect-square and fixed height to allow natural expansion */}
+        <View className="w-full max-w-[400px]">
           <View className="flex-row items-center justify-between mb-4">
             {/* download image */}
             <TouchableOpacity
@@ -46,11 +47,10 @@ const SimpleImageAlert = ({
             </TouchableOpacity>
           </View>
 
-          {/* The Actual Image */}
           <Image
             source={imageSource}
-            className="w-full h-full rounded-lg"
-            resizeMode="contain"
+            className="w-full min-h-[300px] rounded-lg border-[0.5px] border-white/30"
+            resizeMode="cover"
           />
         </View>
       </Pressable>

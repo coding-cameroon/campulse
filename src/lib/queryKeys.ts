@@ -1,4 +1,3 @@
-// src/lib/queryKeys.ts
 export const queryKeys = {
   user: {
     me: ["user", "me"] as const,

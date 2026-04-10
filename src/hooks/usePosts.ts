@@ -1,5 +1,5 @@
 // src/hooks/usePosts.ts
-import { postApi } from "@/app/api/post.api";
+import { postApi } from "@/api/post.api";
 import { useAxios } from "@/lib/axios";
 import { queryKeys } from "@/lib/queryKeys";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";

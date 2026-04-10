@@ -2,10 +2,12 @@ import { iutRegion } from "$/data/map";
 import Button from "@/components/Button";
 import InputField from "@/components/InputField";
 import { COLORS } from "@/utils/colors";
+import { useUser } from "@clerk/expo";
 import BottomSheet, {
   BottomSheetBackdrop,
   BottomSheetView,
 } from "@gorhom/bottom-sheet";
+import { router } from "expo-router";
 import {
   Calendar,
   Camera,
@@ -16,11 +18,11 @@ import {
   MapPin,
   Megaphone,
   Search,
-  User,
   X,
 } from "lucide-react-native";
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import {
+  Image,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -28,6 +30,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { Calendar as DatePicker } from "react-native-calendars";
 import MapView from "react-native-maps";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -44,6 +47,8 @@ const CreatePostScreen = () => {
   const [postType, setPostType] = useState("anonymous_feed");
   const [loading, setLoading] = useState(false);
 
+  const [selected, setSelected] = useState<string>("");
+
   const [form, setForm] = useState({
     name: "",
     desc: "",
@@ -53,6 +58,8 @@ const CreatePostScreen = () => {
     source: "",
     coords: { lat: 0, long: 0 },
   });
+
+  const { user } = useUser();
 
   const toggleAccordion = () => setIsExpanded(!isExpanded);
 
@@ -125,10 +132,14 @@ const CreatePostScreen = () => {
           <View className="flex-row justify-between items-center mb-6 mt-2.5 border-b-[0.5px] border-[#333] pb-4">
             <Text className="text-white text-4xl font-[800]">New Post</Text>
             <TouchableOpacity
-              className="w-11 h-11 rounded-full bg-[#1A1A1A] justify-center items-center border border-[#333]"
+              className="size-14 flex rounded-full bg-[#1A1A1A] justify-center items-center border border-[#333]"
               activeOpacity={0.7}
+              onPress={() => router.push("/user/profile")}
             >
-              <User color="white" size={24} />
+              <Image
+                source={{ uri: user?.imageUrl }}
+                style={{ width: 37, height: 37, borderRadius: 50 }}
+              />
             </TouchableOpacity>
           </View>
 
@@ -228,12 +239,49 @@ const CreatePostScreen = () => {
 
             {postType === "events" && (
               <>
-                <InputField
-                  label="Event Date & Time"
-                  placeholder="e.g. Friday, 24th March at 2 PM"
-                  value={form.eventDate}
-                  onChangeText={(v) => setForm({ ...form, eventDate: v })}
-                />
+                <Text className="text-[10px] font-bold tracking-widest uppercase text-white/50 mb-2 ml-1">
+                  SELECT EVENT DATE
+                </Text>
+                <View className="bg-[#121212] rounded-2xl border border-[#222] overflow-hidden mb-6 p-2">
+                  <DatePicker
+                    minDate={new Date().toISOString().split("T")[0]}
+                    onDayPress={(day) => {
+                      setSelected(day.dateString);
+                      setForm({ ...form, eventDate: day.dateString });
+                    }}
+                    markedDates={{
+                      [selected]: {
+                        selected: true,
+                        disableTouchEvent: true,
+                        selectedColor: COLORS.accent || "white",
+                        selectedTextColor: "black",
+                      },
+                    }}
+                    theme={{
+                      backgroundColor: "#121212",
+                      calendarBackground: "#121212",
+                      textSectionTitleColor: "#b6c1cd",
+                      selectedDayBackgroundColor: COLORS.accent || "white",
+                      selectedDayTextColor: "#000000",
+                      todayTextColor: COLORS.accent || "white",
+                      dayTextColor: "#d9e1e8",
+                      textDisabledColor: "#444",
+                      dotColor: COLORS.accent || "white",
+                      selectedDotColor: "#000",
+                      arrowColor: "white",
+                      disabledArrowColor: "#222",
+                      monthTextColor: "white",
+                      indicatorColor: "white",
+                      textDayFontWeight: "600",
+                      textMonthFontWeight: "bold",
+                      textDayHeaderFontWeight: "500",
+                      textDayFontSize: 14,
+                      textMonthFontSize: 16,
+                      textDayHeaderFontSize: 12,
+                    }}
+                  />
+                </View>
+
                 <InputField
                   label="Venue / Venue Name"
                   placeholder="e.g. Main Auditorium"
@@ -252,7 +300,7 @@ const CreatePostScreen = () => {
                     <MapPin color={COLORS.gray} size={20} />
                     <Text className="text-gray text-[14px]">
                       {form.coords.lat
-                        ? `${form.coords.lat}, ${form.coords.long}`
+                        ? `${form.coords.lat.toFixed(4)}, ${form.coords.long.toFixed(4)}`
                         : "Open Map to set location"}
                     </Text>
                   </TouchableOpacity>

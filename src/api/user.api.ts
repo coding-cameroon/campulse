@@ -1,6 +1,5 @@
-// src/api/user.api.ts
 import { AxiosInstance } from "axios";
-import { User } from "../../../types";
+import { User } from "../../types";
 
 export type SyncUserResponse = {
   success: boolean;

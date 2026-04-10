@@ -44,7 +44,7 @@ const CommentsBottomSheet = forwardRef<BottomSheet, CommentsBottomSheetProps>(
     };
 
     const renderComment = useCallback(({ item }: { item: Comment }) => {
-      const isMe = false; // Replace with actual auth logic
+      const isMe = false;
 
       return (
         <View
@@ -116,8 +116,11 @@ const CommentsBottomSheet = forwardRef<BottomSheet, CommentsBottomSheetProps>(
         backdropComponent={renderBackdrop}
         keyboardBehavior="extend"
         keyboardBlurBehavior="restore"
-        backgroundStyle={{ backgroundColor: COLORS["dark-3"], borderRadius: 0 }}
-        handleIndicatorStyle={{ backgroundColor: "#3f3f46", width: 40 }}
+        backgroundStyle={{
+          backgroundColor: COLORS["dark-2"],
+          borderRadius: 20,
+        }}
+        handleIndicatorStyle={{ display: "none" }}
       >
         <View className="flex-1">
           {/* HEADER */}
@@ -145,6 +148,7 @@ const CommentsBottomSheet = forwardRef<BottomSheet, CommentsBottomSheetProps>(
             data={comments}
             keyExtractor={(item: any) => item._id}
             renderItem={renderComment}
+            showVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingBottom: 500, paddingTop: 10 }}
             ListEmptyComponent={
               <View className="items-center justify-center pt-20">
@@ -157,17 +161,17 @@ const CommentsBottomSheet = forwardRef<BottomSheet, CommentsBottomSheetProps>(
 
           {/* ABSOLUTE INPUT CONTAINER */}
           <View
-            className="absolute bottom-20 left-0 right-0 pt-3 pb-8 border-t"
+            className="absolute bottom-1 left-0 right-0 pt-3 pb-8 border-t"
             style={{
-              backgroundColor: COLORS["dark-3"],
-              borderTopColor: COLORS["dark-2"],
+              backgroundColor: COLORS["dark-2"],
+              borderTopColor: COLORS["dark-1"],
             }}
           >
             <View className="flex-row items-center gap-3 px-4">
               <BottomSheetTextInput
                 placeholder={t("comments.placeholder")}
                 placeholderTextColor="#71717a"
-                className="flex-1 bg-zinc-900 border border-zinc-800 rounded-full text-white px-4 py-2 text-[15px]"
+                className="flex-1 bg-zinc-900 border h-14 border-zinc-800 rounded-full text-white px-4 py-2 text-[15px]"
                 value={commentText}
                 onChangeText={setCommentText}
               />
