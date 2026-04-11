@@ -1,4 +1,5 @@
-import { iutDoualaPolygon, iutRegion, MOCK_CAMPUS_EVENTS } from "$/data/map";
+import { iutRegion, MOCK_CAMPUS_EVENTS } from "$/data/map";
+import { CampusMap as MapCampus } from "@/components/CampusMap";
 import GoogleMap from "@/components/GoogleMap";
 import { COLORS } from "@/utils/colors";
 import { useUser } from "@clerk/expo";
@@ -125,7 +126,7 @@ export default function CampusMap() {
   return (
     <View style={styles.container}>
       {activeTab === "map" ? (
-        <GoogleMap iutDoualaPolygon={iutDoualaPolygon} iutRegion={iutRegion} />
+        <MapCampus iutRegion={iutRegion} />
       ) : (
         <GoogleMap iutRegion={iutRegion} markers={MOCK_CAMPUS_EVENTS} />
       )}

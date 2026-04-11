@@ -1,0 +1,126 @@
+import { CampusEvent } from "../../types";
+
+export const events: CampusEvent[] = [
+  {
+    _id: "t1",
+    title: "GDG Douala: Build with AI",
+    location: "IUT Douala, Salle d'Actes",
+    coordinate: { latitude: 4.0483, longitude: 9.7043 },
+    time: "2026-02-14T10:00:00Z",
+    description:
+      "A deep dive into integrating Gemini into your Node.js and React Native apps.",
+    category: "Tech",
+    author: {
+      _id: "a1",
+      fullName: "Admin",
+      avatarUrl: "https://i.pravatar.cc/100",
+      role: "Admin",
+      email: "a@iut.cm",
+    },
+    images: [
+      "https://images.unsplash.com/photo-1591115765373-520b7a3d72b7?w=800",
+    ],
+    isFree: true,
+    phoneNumber: "+237600000000",
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    _id: "t2",
+    title: "Bun vs Node.js Workshop",
+    location: "Lab 4, GEII Department",
+    coordinate: { latitude: 4.0484, longitude: 9.7044 },
+    time: "2026-02-18T14:00:00Z",
+    description:
+      "Learn why Bun is the future of JavaScript runtimes. Speed benchmarks and setup guide.",
+    category: "Tech",
+    author: {
+      _id: "a2",
+      fullName: "Software Club",
+      avatarUrl: "https://i.pravatar.cc/101",
+      role: "Student",
+      email: "sc@iut.cm",
+    },
+    images: [
+      "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800",
+      "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800",
+    ],
+    isFree: true,
+    phoneNumber: "+237611222333",
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    _id: "ac1",
+    title: "Thesis Defense Prep 101",
+    location: "Conference Room B",
+    coordinate: { latitude: 4.0489, longitude: 9.7049 },
+    time: "2026-03-02T08:00:00Z",
+    description:
+      "Tips on how to structure your final year project presentation and handle Q&A.",
+    category: "Academic",
+    author: {
+      _id: "a4",
+      fullName: "Prof. Ndong",
+      avatarUrl: "https://i.pravatar.cc/103",
+      role: "Lecturer",
+      email: "ndong@iut.cm",
+    },
+    images: [
+      "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=800",
+    ],
+    isFree: true,
+    phoneNumber: "+237600000000",
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    _id: "s1",
+    title: "Freshers Welcome Party",
+    location: "IUT Parking Lot",
+    coordinate: { latitude: 4.0495, longitude: 9.7055 },
+    time: "2026-03-13T19:00:00Z",
+    description:
+      "Music, food, and networking for all new students. Come meet your peers!",
+    category: "Social",
+    author: {
+      _id: "a1",
+      fullName: "Admin",
+      avatarUrl: "https://i.pravatar.cc/100",
+      role: "Admin",
+      email: "a@iut.cm",
+    },
+    images: [
+      "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800",
+    ],
+    isFree: false,
+    price: 2000,
+    phoneNumber: "+237600000000",
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    _id: "sp1",
+    title: "Inter-Dept Football Finals",
+    location: "Campus Stadium",
+    coordinate: { latitude: 4.0507, longitude: 9.7067 },
+    time: "2026-04-18T15:00:00Z",
+    description:
+      "The big match: GI vs GIM. Come support your favorite department!",
+    category: "Sports",
+    author: {
+      _id: "a1",
+      fullName: "Admin",
+      avatarUrl: "https://i.pravatar.cc/100",
+      role: "Admin",
+      email: "a@iut.cm",
+    },
+    images: [
+      "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800",
+    ],
+    isFree: true,
+    phoneNumber: "+237600000000",
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+];

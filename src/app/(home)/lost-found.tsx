@@ -38,7 +38,7 @@ export default function LostFoundScreen() {
   const handleOpenSheet = useCallback((id: string) => {
     setSelectedItemId(id);
 
-    sheetRef.current?.snapToIndex(0);
+    sheetRef.current?.expand();
   }, []);
 
   const handleSubmit = (text: string) => {
@@ -49,7 +49,7 @@ export default function LostFoundScreen() {
     () => (
       /* We add padding top based on the device's notch/status bar height */
       <View
-        className="absolute top-0 left-0 right-0 z-10 bg-black/90 px-4 pb-4"
+        className="absolute top-0 left-0 right-0 z-0 bg-black/90 px-4 pb-4"
         style={{ paddingTop: insets.top + 5 }}
       >
         {/* STATIC TITLE */}

@@ -347,6 +347,9 @@ const CreatePostScreen = () => {
           </View>
 
           {/* MAP */}
+          <Text className="text-md font-bold tracking-wide text-gray text-left px-2">
+            Long press to select location
+          </Text>
           <View className="w-full items-center mt-3">
             <MapView
               mapType="hybrid"
