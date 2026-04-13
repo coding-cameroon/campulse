@@ -1,7 +1,8 @@
 import { MOCK_POSTS } from "$/data/post";
+import { useDeactivateUser, useGetMe, useUpdateName } from "@/hooks/useUser";
 import { COLORS } from "@/utils/colors";
 import { formatDate } from "@/utils/date";
-import { useAuth, useUser } from "@clerk/expo";
+import { useAuth } from "@clerk/expo";
 import { Stack, useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import {
@@ -21,6 +22,7 @@ import {
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
+  ActivityIndicator,
   Dimensions,
   Image,
   KeyboardAvoidingView,
@@ -37,15 +39,26 @@ const { width } = Dimensions.get("window");
 
 export default function ProfileScreen() {
   const router = useRouter();
-  const { user } = useUser();
+  const { user } = useGetMe();
   const { signOut } = useAuth();
   const { i18n, t } = useTranslation("profile");
+  const {
+    mutateAsync: updateUsername,
+    isPending,
+    isError,
+    error,
+  } = useUpdateName();
+  const { mutateAsync: deactivateUser, isPending: isSignOutPending } =
+    useDeactivateUser();
 
   const [isLanguageOpen, setIsLanguageOpen] = useState(false);
   const [isPostsOpen, setIsPostsOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState("English");
   const [myPosts, setMyPosts] = useState(MOCK_POSTS.slice(0, 5));
+
+  // update name
+  const [payload, setPayload] = useState({ firstname: "", lastname: "" });
 
   const [modalConfig, setModalConfig] = useState({
     visible: false,
@@ -60,8 +73,9 @@ export default function ProfileScreen() {
     setModalConfig((prev) => ({ ...prev, visible: false }));
 
   const getDisplayName = () => {
-    if (user?.firstName && user?.lastName) return user.fullName;
-    const emailHandle = user?.emailAddresses?.[0]?.emailAddress?.split("@")[0];
+    if (user?.firstName && user?.lastName)
+      return `${user.firstName} ${user.lastName}`;
+    const emailHandle = user?.email.split("@")[0];
     return emailHandle
       ? emailHandle.charAt(0).toUpperCase() + emailHandle.slice(1)
       : "Guest";
@@ -72,6 +86,40 @@ export default function ProfileScreen() {
     i18n.changeLanguage(lang);
   };
 
+  // UPDATE USER FN
+  const handleNameUpdate = async () => {
+    try {
+      await updateUsername(payload);
+
+      console.log("Name updated successfully!");
+      console.log(JSON.stringify(user, null, 2));
+
+      // Close the edit accordion on success
+      setIsEditOpen(false);
+
+      // Optionally alert the user
+      console.log("Name updated successfully!");
+    } catch (error) {
+      // Errors are already handled in the hook's onError,
+      // but you can catch them here for local UI logic too.
+      console.log(error);
+    }
+  };
+
+  // DEACTIVATE USER FN
+  const handleDeactivateUser = async () => {
+    try {
+      const { success, data } = await deactivateUser(user?.id!);
+
+      if (!success || !data) return;
+
+      console.log("User deactivated.");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // SIGN OUT FN
   const initiateSignOut = () => {
     setModalConfig({
       visible: true,
@@ -81,8 +129,11 @@ export default function ProfileScreen() {
       confirmText: t("preferences.signOut"),
       onConfirm: async () => {
         try {
+          await handleDeactivateUser();
           await signOut();
           closeModal();
+
+          router.replace("/(auth)/sign-in");
         } catch (error) {
           console.error("Error signing out:", error);
         }
@@ -152,7 +203,7 @@ export default function ProfileScreen() {
         <View style={{ width }} className="h-[220px]">
           <Image
             source={{
-              uri: "https://tse2.mm.bing.net/th/id/OIP._XuPSkfdjac9iIbQQrJ8sQHaED?w=2500&h=1369&rs=1&pid=ImgDetMain&o=7&rm=3",
+              uri: user?.coverAvatarUrl || "",
             }}
             className="h-full w-full"
             resizeMode="cover"
@@ -169,7 +220,7 @@ export default function ProfileScreen() {
         {/* ── 2. PROFILE HEADER ── */}
         <View className="items-center px-5 -mt-[55px]">
           <Image
-            source={{ uri: user?.imageUrl }}
+            source={{ uri: user?.realAvatarUrl || "" }}
             className="size-[130px] rounded-full border-4 border-black"
           />
 
@@ -178,7 +229,7 @@ export default function ProfileScreen() {
               {getDisplayName()}
             </Text>
             <Text className="mt-1 text-sm font-semibold text-white/40">
-              {user?.emailAddresses[0].emailAddress}
+              {user?.email}
             </Text>
           </View>
 
@@ -197,10 +248,10 @@ export default function ProfileScreen() {
                   </Text>
                 </View>
                 <Text
-                  className="text-sm font-extrabold"
+                  className="text-md font-extrabold"
                   style={{ color: COLORS.accent }}
                 >
-                  @shinny_squirrel
+                  @{user?.anonymousName}
                 </Text>
               </View>
 
@@ -216,8 +267,7 @@ export default function ProfileScreen() {
                   className="text-sm font-extrabold"
                   style={{ color: COLORS.accent }}
                 >
-                  {(user?.publicMetadata?.role as string) ||
-                    t("profile.userRole")}
+                  {user?.role || t("profile.userRole")}
                 </Text>
               </View>
             </View>
@@ -271,9 +321,9 @@ export default function ProfileScreen() {
                       onPress={() => {}}
                     >
                       <View className="size-28 rounded-full border-2 border-white/10 overflow-hidden bg-white/5 items-center justify-center">
-                        {user?.imageUrl ? (
+                        {user?.realAvatarUrl ? (
                           <Image
-                            source={{ uri: user.imageUrl }}
+                            source={{ uri: user.realAvatarUrl }}
                             className="size-full"
                           />
                         ) : (
@@ -301,7 +351,7 @@ export default function ProfileScreen() {
                     >
                       <Image
                         source={{
-                          uri: "https://tse2.mm.bing.net/th/id/OIP._XuPSkfdjac9iIbQQrJ8sQHaED?w=2500&h=1369&rs=1&pid=ImgDetMain&o=7&rm=3",
+                          uri: user?.coverAvatarUrl || "",
                         }}
                         className="size-full"
                         resizeMode="cover"
@@ -324,6 +374,9 @@ export default function ProfileScreen() {
                       placeholder={t(
                         "profile.editProfile.placeholders.firstName",
                       )}
+                      onChangeText={(text) =>
+                        setPayload((prev) => ({ ...prev, firstname: text }))
+                      }
                       placeholderTextColor="rgba(255,255,255,0.2)"
                       defaultValue={user?.firstName || ""}
                       className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white font-semibold"
@@ -339,20 +392,34 @@ export default function ProfileScreen() {
                       placeholder={t(
                         "profile.editProfile.placeholders.lastName",
                       )}
+                      onChangeText={(text) =>
+                        setPayload((prev) => ({ ...prev, lastname: text }))
+                      }
                       placeholderTextColor="rgba(255,255,255,0.2)"
                       defaultValue={user?.lastName || ""}
                       className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white font-semibold"
                     />
                   </View>
 
+                  {isError && (
+                    <Text className="text-xs font-bold text-red-500 tracking-wider">
+                      {error?.response?.data?.message || error.message}
+                    </Text>
+                  )}
+
                   <TouchableOpacity
+                    disabled={isPending}
                     style={{ backgroundColor: COLORS.accent }}
                     className="w-full py-4 rounded-xl items-center mt-4"
-                    onPress={() => {}}
+                    onPress={handleNameUpdate}
                   >
-                    <Text className="text-black font-black uppercase tracking-widest text-xs">
-                      {t("profile.editProfile.save")}
-                    </Text>
+                    {isPending ? (
+                      <ActivityIndicator size={"small"} color="#000" />
+                    ) : (
+                      <Text className="text-black font-black uppercase tracking-widest text-xs">
+                        {t("profile.editProfile.save")}
+                      </Text>
+                    )}
                   </TouchableOpacity>
                 </View>
               )}
@@ -426,14 +493,18 @@ export default function ProfileScreen() {
               activeOpacity={0.7}
               className="flex-row items-center justify-between py-4"
             >
-              <View className="flex-row items-center gap-3">
-                <View className="p-2 rounded-lg bg-red-500/10">
-                  <LogOut color="#ef4444" size={20} />
+              {isSignOutPending ? (
+                <ActivityIndicator size={"small"} color="#ef4444" />
+              ) : (
+                <View className="flex-row items-center gap-3">
+                  <View className="p-2 rounded-lg bg-red-500/10">
+                    <LogOut color="#ef4444" size={20} />
+                  </View>
+                  <Text className="text-base font-bold text-red-500">
+                    {t("preferences.signOut")}
+                  </Text>
                 </View>
-                <Text className="text-base font-bold text-red-500">
-                  {t("preferences.signOut")}
-                </Text>
-              </View>
+              )}
             </TouchableOpacity>
           </View>
         </View>

@@ -3,6 +3,7 @@ import { MOCK_POSTS } from "$/data/post";
 import CustomBottomSheet from "@/components/CustomBottomSheet";
 import InputField from "@/components/InputField";
 import PostCard from "@/components/PostCard";
+import { useGetMe } from "@/hooks/useUser";
 import { COLORS } from "@/utils/colors";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { Search, X } from "lucide-react-native";
@@ -12,6 +13,7 @@ import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function PostScreen() {
+  const { user } = useGetMe();
   const insets = useSafeAreaInsets();
   const [searchText, setSearchText] = useState("");
   const [isSearching, setIsSearching] = useState(false);
@@ -60,7 +62,9 @@ export default function PostScreen() {
         {/* profile */}
         <TouchableOpacity activeOpacity={0.7}>
           <Image
-            source={require("$/images/icon.png")}
+            source={{
+              uri: user?.anonymousAvatarUrl,
+            }}
             className="w-10 h-10 rounded-full border-[1.5px] border-[#333]"
           />
         </TouchableOpacity>

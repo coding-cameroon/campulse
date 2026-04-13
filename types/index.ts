@@ -98,6 +98,7 @@ export interface PostCardProps {
 export interface User {
   clerkId: string;
   email: string;
+  anonymousName: string;
   anonymousAvatarUrl: string;
   role?: "student" | "admin";
   id?: string;
@@ -118,7 +119,7 @@ export interface Post {
   category: "feed" | "event" | "lost_found";
   id?: string;
   realAvatarUrl?: string | null;
-  createdAt?: string;
+  createdAt?: string | Date;
   updatedAt?: string;
   status?: "active" | "expired" | "removed";
   title?: string | null;
@@ -138,7 +139,7 @@ export interface Post {
     lat: number;
     lng: number;
   } | null;
-  expiresAt: string;
+  expiresAt: Date | string;
   reactionCount: number;
   commentCount: number;
 }

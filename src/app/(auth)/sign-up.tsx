@@ -1,7 +1,8 @@
 import Button from "@/components/Button";
 import InputField from "@/components/InputField";
+import { useSyncUser } from "@/hooks/useUser";
 import { COLORS } from "@/utils/colors";
-import { useSignUp } from "@clerk/expo";
+import { useAuth, useSignUp } from "@clerk/expo";
 import { Href, useRouter } from "expo-router";
 import {
   ArrowRight,
@@ -29,6 +30,8 @@ const SignUpScreen = () => {
   const router = useRouter();
   const { signUp } = useSignUp();
 
+  const { getToken } = useAuth();
+
   const [emailAddress, setEmailAddress] = useState("");
   const [password, setPassword] = useState("");
   const [code, setCode] = useState("");
@@ -37,6 +40,8 @@ const SignUpScreen = () => {
   const [error, setError] = useState<any>("");
   const [errorCode, setErrorCode] = useState<any>("");
   const [showPassword, setShowPassword] = useState(false);
+
+  const { mutateAsync: syncUser } = useSyncUser();
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -67,8 +72,7 @@ const SignUpScreen = () => {
 
       if (signUp.status === "complete") {
         await signUp.finalize({
-          // Redirect the user to the home page after signing up
-          navigate: ({ session, decorateUrl }) => {
+          navigate: async ({ session, decorateUrl }) => {
             if (session?.currentTask) {
               console.log({ session: session?.currentTask });
               return;

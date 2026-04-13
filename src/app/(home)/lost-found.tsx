@@ -3,6 +3,7 @@ import CustomBottomSheet from "@/components/CustomBottomSheet";
 import EmptyState from "@/components/EmptyListComponent";
 import InputField from "@/components/InputField";
 import LostAndFoundCard from "@/components/LostFoundCard";
+import { useGetMe } from "@/hooks/useUser";
 import { COLORS } from "@/utils/colors";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { router } from "expo-router";
@@ -13,6 +14,7 @@ import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function LostFoundScreen() {
+  const { user } = useGetMe();
   const insets = useSafeAreaInsets();
   const [isSearching, setIsSearching] = useState(false);
   const [searchText, setSearchText] = useState("");
@@ -67,7 +69,7 @@ export default function LostFoundScreen() {
             onPress={() => router.push("/user/profile")}
           >
             <Image
-              source={require("$/images/icon.png")}
+              source={{ uri: user?.realAvatarUrl! }}
               className="w-10 h-10 rounded-full border-[1.5px] border-[#333]"
             />
           </TouchableOpacity>
