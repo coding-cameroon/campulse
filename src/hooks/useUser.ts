@@ -103,3 +103,20 @@ export const useDeactivateUser = () => {
     },
   });
 };
+
+// ── useDeactivateUser ─────────────────────────────────────────────────────────────
+// Toggles the current user's isActive state
+export const useGetUser = (id: string) => {
+  const axios = useAxios();
+
+  const query = useQuery({
+    queryKey: queryKeys.user.single(id),
+    queryFn: () => userApi(axios).getUser(id),
+    retry: (failureCount, error: any) => {
+      if (error?.response?.status === 404) return false;
+      return failureCount < 2;
+    },
+  });
+
+  return { ...query, user: query?.data?.data };
+};

@@ -13,9 +13,9 @@ const PostCard = ({
   post: Post;
   onPressEvent: (id: string) => void;
 }) => {
-  const [selectedImg, setSelectedImg] = useState(null);
-  const [isLiked, setIsLiked] = useState(post.isLikedByMe || false);
-  const [likesCount, setLikesCount] = useState(post.likesCount || 0);
+  const [selectedImg, setSelectedImg] = useState<string | null>(null);
+  const [isLiked, setIsLiked] = useState(false);
+  const [likesCount, setLikesCount] = useState(0);
 
   // 1. Initialize the scale value (starting at 1)
   const scaleAnim = useRef(new Animated.Value(1)).current;
@@ -48,11 +48,7 @@ const PostCard = ({
       {/* User Avatar */}
       <View className="overflow-hidden rounded-full border border-gray-800">
         <Image
-          source={
-            post.author.avatarUrl
-              ? { uri: post.author.avatarUrl }
-              : require("$/images/icon.png")
-          }
+          source={{ uri: post.anonAvatarUrl! }}
           className="w-[35px] h-[35px]"
           resizeMode="cover"
         />
@@ -63,7 +59,7 @@ const PostCard = ({
         <View className="flex-row items-center justify-between p-3 pb-1">
           <View className="flex-row gap-2 items-center">
             <Text className="text-[17px] font-bold text-white">
-              {post.author.username}
+              {post.anonName}
             </Text>
             <Text
               className="text-md font-semibold text-gray-300"
@@ -80,7 +76,7 @@ const PostCard = ({
           <View className="flex-row items-center gap-1 bg-orange-500/10 rounded-full border-[0.5px] border-orange-500/50 p-1 px-3">
             <BrickWallFire size={12} color="#f97316" />
             <Text className="text-orange-500 text-[10px] font-black uppercase">
-              {getTimeLeft(post.expiresAt)}
+              {getTimeLeft(post.expiresAt as Date)}
             </Text>
           </View>
         </View>
@@ -88,26 +84,22 @@ const PostCard = ({
         {/* Post Content */}
         <View className="px-3 py-2 mb-2">
           <Text className="text-[15px] text-white font-semibold leading-5">
-            {post.content}
+            {post.body}
           </Text>
         </View>
 
         {/* Main Post Image */}
-        {post.postImage && (
+        {post?.imageUrls?.[0] && (
           <TouchableOpacity
             onPress={() => {
-              setSelectedImg(post.postImage);
+              setSelectedImg(post?.imageUrls![0]);
             }}
             className="px-3 pb-2"
           >
             <Image
-              source={
-                typeof post.postImage === "string"
-                  ? { uri: post.postImage }
-                  : post.postImage
-              }
+              source={{ uri: post.imageUrls[0]! }}
               className="w-full rounded-xl"
-              style={{ aspectRatio: 1 }} // Keeps it square but shows the full image inside
+              style={{ aspectRatio: 1 }}
               resizeMode="cover"
             />
           </TouchableOpacity>
@@ -145,12 +137,12 @@ const PostCard = ({
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={() => onPressEvent(post._id)}
+            onPress={() => onPressEvent(post.id)}
             className="flex-row gap-1.5 items-center justify-center bg-white/5 p-2 px-4 border-[0.5px] border-dark-1 rounded-full"
           >
             <MessageCircleMore size={18} color="white" />
             <Text className="text-white font-bold text-xs">
-              {post.commentsCount}
+              {post.commentCount}
             </Text>
           </TouchableOpacity>
         </View>

@@ -20,28 +20,31 @@ import {
   Image,
   Linking,
   ScrollView,
+  StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { events } from "$/data/event";
 import CommentsBottomSheet from "@/components/CustomBottomSheet";
 import EmptyState from "@/components/EmptyListComponent";
 import { EventCard } from "@/components/EventCard";
 import SimpleImageAlert from "@/components/ImageOverLay";
 import InputField from "@/components/InputField";
+import { useCreateComment, useGetComments } from "@/hooks/useComment";
+import { useGetPosts } from "@/hooks/usePosts";
 import { COLORS } from "@/utils/colors";
-import { CampusEvent, EventCategory } from "../../../types";
+import { EventCategory, Post } from "../../../types";
 
 export default function EventsScreen() {
   const insets = useSafeAreaInsets();
+  const { posts, isLoading } = useGetPosts({ category: "event" });
 
   const [isSearching, setIsSearching] = useState(false);
   const [activeTab, setActiveTab] = useState<EventCategory | "All">("All");
   const [searchText, setSearchText] = useState("");
-  const [selectedEvent, setSelectedEvent] = useState<CampusEvent | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<Post | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [imageAlertVisible, setImageAlertVisible] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -57,7 +60,6 @@ export default function EventsScreen() {
   const detailSheetRef = useRef<BottomSheet>(null);
   const commentsSheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ["40%", "80%"], []);
-  const commentSnapPoints = useMemo(() => ["75%"], []);
 
   const categories: (EventCategory | "All")[] = [
     "All",
@@ -68,22 +70,33 @@ export default function EventsScreen() {
     "Sports",
   ];
 
+  const { comments, isLoading: isCommentLoading } = useGetComments(
+    activeCommentEventId as string,
+  );
+  const { mutateAsync: createComment, isPending } = useCreateComment(
+    activeCommentEventId as string,
+  );
+
+  console.log(JSON.stringify(comments, null, 2));
+
   const filteredEvents = useMemo(() => {
-    let result = events;
+    let result = posts;
     if (activeTab !== "All") {
-      result = result.filter((e) => e.category === activeTab);
+      result = result.filter((e) => e.eventCategory === activeTab);
     }
     if (searchText) {
       result = result.filter(
         (e) =>
-          e.title.toLowerCase().includes(searchText.toLowerCase()) ||
-          e.location.toLowerCase().includes(searchText.toLowerCase()),
+          (e.title &&
+            e.title.toLowerCase().includes(searchText.toLowerCase())) ||
+          (e.eventLocation &&
+            e.eventLocation.toLowerCase().includes(searchText.toLowerCase())),
       );
     }
     return result;
   }, [activeTab, searchText]);
 
-  const handlePresentModal = useCallback((event: CampusEvent) => {
+  const handlePresentModal = useCallback((event: Post) => {
     setSelectedEvent(event);
     setSheetOpen(true);
     detailSheetRef.current?.snapToIndex(1);
@@ -101,20 +114,10 @@ export default function EventsScreen() {
 
   // ✅ Adds comment to the correct event's list
   const handleSendComment = async (text: string) => {
-    if (!activeCommentEventId) return;
-    const newComment = {
-      _id: Date.now().toString(),
-      content: text,
-      author: { fullName: "You", avatarUrl: null },
-      createdAt: new Date().toISOString(),
-    };
-    setCommentsByEvent((prev: any) => ({
-      ...prev,
-      [activeCommentEventId]: [
-        ...(prev[activeCommentEventId] || []),
-        newComment,
-      ],
-    }));
+    if (!activeCommentEventId || !text) return;
+
+    await createComment({ postId: activeCommentEventId, newComment: text });
+    console.log("✅ comment created.");
   };
 
   const handleImagePress = (uri: string) => {
@@ -143,7 +146,7 @@ export default function EventsScreen() {
   const openWhatsApp = (phoneNumber: string) => {
     if (!selectedEvent) return;
     const cleanNumber = phoneNumber.replace(/\s/g, "");
-    const message = `Hello! I'm interested in the event: *${selectedEvent.title}* 🗓️\n📍 Location: ${selectedEvent.location}\n💰 Entry: ${selectedEvent.isFree ? "Free" : `${selectedEvent.price} CFA`}`;
+    const message = `Hello! I'm interested in the event: *${selectedEvent.title}* 🗓️\n📍 Location: ${selectedEvent.eventLocation}\n💰 Entry: ${selectedEvent.isFree ? "Free" : `${selectedEvent.price} CFA`}`;
     const url = `whatsapp://send?phone=${cleanNumber}&text=${encodeURIComponent(message)}`;
     Linking.canOpenURL(url).then((supported) => {
       if (supported) Linking.openURL(url);
@@ -151,10 +154,9 @@ export default function EventsScreen() {
     });
   };
 
-  // Active event's comments
-  const activeComments = activeCommentEventId
-    ? commentsByEvent[activeCommentEventId] || []
-    : [];
+
+  // const eventCat = posts.filter((post) => post.eventCategory === "Tech");
+  // console.log(JSON.stringify(posts.splice(0), null, 2));
 
   return (
     <>
@@ -199,7 +201,7 @@ export default function EventsScreen() {
           </View>
 
           {isSearching ? (
-            <View className="mb-4">
+            <View>
               <InputField
                 autoFocus
                 placeholder="Search for an event..."
@@ -245,13 +247,13 @@ export default function EventsScreen() {
         {/* ── EVENT LIST ── */}
         <FlatList
           data={filteredEvents}
-          keyExtractor={(item) => item._id}
+          keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <EventCard
               event={item}
               onPress={() => handlePresentModal(item)}
               onCommentPress={handleCommentPress}
-              commentCount={commentsByEvent[item._id]?.length || 0}
+              commentCount={commentsByEvent[item.id]?.length || 0}
             />
           )}
           contentContainerStyle={{ padding: 16, paddingBottom: 120 }}
@@ -270,7 +272,11 @@ export default function EventsScreen() {
         enableContentPanningGesture={false}
         handleComponent={null}
         backdropComponent={renderDetailBackdrop}
-        backgroundStyle={{ backgroundColor: COLORS["dark-3"] }}
+        backgroundStyle={{
+          borderTopWidth: StyleSheet.hairlineWidth,
+          borderTopColor: COLORS["dark-2"],
+          backgroundColor: COLORS["dark-3"],
+        }}
         onClose={() => {
           setSheetOpen(false);
           setSelectedEvent(null);
@@ -297,8 +303,7 @@ export default function EventsScreen() {
                         {selectedEvent.title}
                       </Text>
                       <Text className="text-zinc-500 text-[11px] uppercase font-bold tracking-wide mt-0.5">
-                        {selectedEvent.category} ·{" "}
-                        {selectedEvent.author.fullName}
+                        {selectedEvent.category} · {selectedEvent.realName}
                       </Text>
                     </View>
                   </View>
@@ -330,7 +335,9 @@ export default function EventsScreen() {
                       className="text-zinc-100 font-semibold text-sm"
                       numberOfLines={1}
                     >
-                      {dayjs(selectedEvent.time).format("MMM DD, hh:mm A")}
+                      {dayjs(selectedEvent.eventStartAt).format(
+                        "MMM DD, hh:mm A",
+                      )}
                     </Text>
                   </View>
 
@@ -345,7 +352,7 @@ export default function EventsScreen() {
                       className="text-zinc-100 font-semibold text-sm"
                       numberOfLines={1}
                     >
-                      {selectedEvent.location}
+                      {selectedEvent.eventLocation}
                     </Text>
                   </View>
 
@@ -400,44 +407,47 @@ export default function EventsScreen() {
                     About this event
                   </Text>
                   <Text className="text-zinc-300 text-[15px] leading-6 font-medium">
-                    {selectedEvent.description}
+                    {selectedEvent.body}
                   </Text>
                 </View>
 
-                {selectedEvent.images.length > 0 && (
-                  <View className="mt-6">
-                    <Text className="text-zinc-500 text-[10px] uppercase font-black tracking-widest mb-3">
-                      Gallery
-                    </Text>
-                    <ScrollView
-                      horizontal
-                      showsHorizontalScrollIndicator={false}
-                    >
-                      {selectedEvent.images.map((img, index) => (
-                        <TouchableOpacity
-                          key={`${img}-${index}`}
-                          onPress={() => handleImagePress(img)}
-                          activeOpacity={0.85}
-                          className="mr-3"
-                        >
-                          <Image
-                            source={{ uri: img }}
-                            style={{
-                              width: 180,
-                              height: 180,
-                              borderRadius: 16,
-                              backgroundColor: "#18181b",
-                            }}
-                            resizeMode="cover"
-                          />
-                        </TouchableOpacity>
-                      ))}
-                    </ScrollView>
-                  </View>
-                )}
+                {selectedEvent.imageUrls &&
+                  selectedEvent.imageUrls.length > 0 && (
+                    <View className="mt-6">
+                      <Text className="text-zinc-500 text-[10px] uppercase font-black tracking-widest mb-3">
+                        Gallery
+                      </Text>
+                      <ScrollView
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                      >
+                        {selectedEvent.imageUrls.map((img, index) => (
+                          <TouchableOpacity
+                            key={`${img}-${index}`}
+                            onPress={() => handleImagePress(img)}
+                            activeOpacity={0.85}
+                            className="mr-3"
+                          >
+                            <Image
+                              source={{ uri: img }}
+                              style={{
+                                width: 180,
+                                height: 180,
+                                borderRadius: 16,
+                                backgroundColor: "#18181b",
+                              }}
+                              resizeMode="cover"
+                            />
+                          </TouchableOpacity>
+                        ))}
+                      </ScrollView>
+                    </View>
+                  )}
 
                 <TouchableOpacity
-                  onPress={() => openWhatsApp(selectedEvent.phoneNumber)}
+                  onPress={() =>
+                    openWhatsApp(String(selectedEvent.phoneNumber))
+                  }
                   activeOpacity={0.85}
                   className="flex-row items-center justify-center py-4 rounded-2xl mt-8 gap-2 border-[0.5px] border-[#22c55e]"
                   style={{ backgroundColor: "rgba(34,197,94,0.12)" }}
@@ -456,7 +466,7 @@ export default function EventsScreen() {
       {/* ── COMMENTS SHEET — screen level, always reachable ── */}
       <CommentsBottomSheet
         ref={commentsSheetRef}
-        comments={activeComments}
+        comments={comments ?? []}
         onSendComment={handleSendComment}
         onClose={() => setActiveCommentEventId(null)}
       />

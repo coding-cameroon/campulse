@@ -1,7 +1,8 @@
 import Button from "@/components/Button";
 import InputField from "@/components/InputField";
 import { COLORS } from "@/utils/colors";
-import { router } from "expo-router";
+import { useAuth } from "@clerk/expo";
+import { Redirect, router } from "expo-router";
 import { ArrowRight, Info } from "lucide-react-native";
 import React, { useState } from "react";
 import {
@@ -16,6 +17,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const OnBoardingScreen = () => {
+  const { isSignedIn } = useAuth();
   const [email, setEmail] = useState<string>("");
   const [error, setError] = useState<string>("");
   const schoolEmail = "iut-university@gmail.com";
@@ -36,6 +38,8 @@ const OnBoardingScreen = () => {
 
     router.push("/(auth)/auth");
   };
+
+  if (!!isSignedIn) return <Redirect href={"/(home)"} />;
 
   return (
     <SafeAreaView style={styles.safeArea}>

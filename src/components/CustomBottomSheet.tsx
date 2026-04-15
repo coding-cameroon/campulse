@@ -16,7 +16,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { Comment } from "../../types/index";
+import { Comment } from "../../types";
 
 interface CommentsBottomSheetProps {
   comments: Comment[];
@@ -37,15 +37,13 @@ const CommentsBottomSheet = forwardRef<BottomSheet, CommentsBottomSheetProps>(
       onClose?.(); // ✅ notify parent when closed via X button
     }, [ref, onClose]);
 
-    const handlePostComment = async () => {
-      if (!commentText.trim()) return;
-      setIsSubmitting(true);
-      await onSendComment(commentText);
-      setCommentText("");
-      setIsSubmitting(false);
-    };
+    // const handlePostComment = async () => {
+    //   if (!commentText.trim()) return;
+    //   await onSendComment(commentText);
+    //   setCommentText("");
+    // };
 
-    const renderComment = useCallback(({ item }: { item: Comment }) => {
+    const renderComment = useCallback((item: Comment) => {
       const isMe = false;
 
       return (
@@ -54,15 +52,15 @@ const CommentsBottomSheet = forwardRef<BottomSheet, CommentsBottomSheetProps>(
         >
           {/* ── AVATAR ── */}
           <View className="size-8 rounded-full bg-zinc-800 overflow-hidden border border-zinc-700/50 mt-auto shrink-0">
-            {item.author.avatarUrl ? (
+            {item.author.anonymousAvatarUrl ? (
               <Image
-                source={{ uri: item.author.avatarUrl }}
+                source={{ uri: item.author.anonymousAvatarUrl }}
                 className="w-full h-full"
               />
             ) : (
               <View className="w-full h-full items-center justify-center bg-zinc-700">
                 <Text className="text-white text-[10px] font-black">
-                  {item.author.fullName?.charAt(0).toUpperCase()}
+                  {item.author.anonymousName?.charAt(0).toUpperCase()}
                 </Text>
               </View>
             )}
@@ -72,7 +70,7 @@ const CommentsBottomSheet = forwardRef<BottomSheet, CommentsBottomSheetProps>(
           <View className={`max-w-[78%] ${isMe ? "items-end" : "items-start"}`}>
             {!isMe && (
               <Text className="text-zinc-500 text-[10px] font-black uppercase tracking-wider ml-3 mb-1">
-                {item.author.fullName}
+                {item.author.anonymousName}
               </Text>
             )}
 
@@ -90,7 +88,7 @@ const CommentsBottomSheet = forwardRef<BottomSheet, CommentsBottomSheetProps>(
                 className="text-white text-[14px] leading-5 font-medium"
                 style={{ color: isMe ? "#000" : "#fff" }}
               >
-                {item.content}
+                {item.body}
               </Text>
 
               <Text
@@ -179,8 +177,8 @@ const CommentsBottomSheet = forwardRef<BottomSheet, CommentsBottomSheetProps>(
           {/* ── COMMENT LIST ── */}
           <BottomSheetFlatList
             data={comments}
-            keyExtractor={(item: any) => item._id + Math.random() * 10000}
-            renderItem={renderComment}
+            keyExtractor={(item: Comment) => item.id}
+            renderItem={({ item }: { item: Comment }) => renderComment(item)}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingBottom: 16, paddingTop: 12 }}
             style={{ flex: 1 }}
@@ -222,7 +220,10 @@ const CommentsBottomSheet = forwardRef<BottomSheet, CommentsBottomSheetProps>(
 
               <TouchableOpacity
                 disabled={isSubmitting || !commentText.trim()}
-                onPress={handlePostComment}
+                onPress={() => {
+                  onSendComment(commentText);
+                  setCommentText("");
+                }}
                 className="size-12 rounded-full items-center justify-center"
                 style={{
                   backgroundColor: commentText.trim()
@@ -232,7 +233,7 @@ const CommentsBottomSheet = forwardRef<BottomSheet, CommentsBottomSheetProps>(
                   borderColor: commentText.trim() ? COLORS.accent : "#27272a",
                 }}
               >
-                {isSubmitting || isLoading ? (
+                {isLoading ? (
                   <ActivityIndicator size="small" color="#000" />
                 ) : (
                   <ArrowUp

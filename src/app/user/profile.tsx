@@ -1,8 +1,8 @@
 import { MOCK_POSTS } from "$/data/post";
 import { useDeactivateUser, useGetMe, useUpdateName } from "@/hooks/useUser";
 import { COLORS } from "@/utils/colors";
-import { formatDate } from "@/utils/date";
 import { useAuth } from "@clerk/expo";
+// import * as ImagePicker from "expo-image-picker";
 import { Stack, useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import {
@@ -10,12 +10,9 @@ import {
   Camera,
   ChevronRight,
   CircleUser,
-  Clock,
   Languages,
   LayoutList,
   LogOut,
-  PackageOpen,
-  Trash2,
   TriangleAlert,
   UserRoundPen,
 } from "lucide-react-native";
@@ -51,6 +48,7 @@ export default function ProfileScreen() {
   const { mutateAsync: deactivateUser, isPending: isSignOutPending } =
     useDeactivateUser();
 
+  const [image, setImage] = useState<string | null>();
   const [isLanguageOpen, setIsLanguageOpen] = useState(false);
   const [isPostsOpen, setIsPostsOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -129,7 +127,7 @@ export default function ProfileScreen() {
       confirmText: t("preferences.signOut"),
       onConfirm: async () => {
         try {
-          await handleDeactivateUser();
+          // await handleDeactivateUser();
           await signOut();
           closeModal();
 
@@ -141,6 +139,33 @@ export default function ProfileScreen() {
     });
   };
 
+  // PICK IMAGE
+  const pickImage = async () => {
+    // No permissions request is necessary for launching the image library.
+    // Manually request permissions for videos on iOS when `allowsEditing` is set to `false`
+    // and `videoExportPreset` is `'Passthrough'` (the default), ideally before launching the picker
+    // so the app users aren't surprised by a system dialog after picking a video.
+    // See "Invoke permissions for videos" sub section for more details.
+    // const permissionResult =
+    //   await ImagePicker.requestMediaLibraryPermissionsAsync();
+    // if (!permissionResult.granted) {
+    //   Alert.alert(
+    //     "Permission required",
+    //     "Permission to access the media library is required.",
+    //   );
+    //   return;
+    // }
+    // let result = await ImagePicker.launchImageLibraryAsync({
+    //   mediaTypes: ["images", "videos"],
+    //   allowsEditing: true,
+    //   aspect: [4, 3],
+    //   quality: 1,
+    // });
+    // console.log(result);
+    // if (!result.canceled) {
+    //   setImage(result.assets[0].uri);
+    // }
+  };
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -330,12 +355,13 @@ export default function ProfileScreen() {
                           <CircleUser color="rgba(255,255,255,0.2)" size={48} />
                         )}
                       </View>
-                      <View
+                      <TouchableOpacity
+                        onPress={async () => await pickImage()}
                         className="absolute bottom-1 right-1 p-2 rounded-full border-2 border-black"
                         style={{ backgroundColor: COLORS.accent }}
                       >
                         <Camera color="black" size={16} />
-                      </View>
+                      </TouchableOpacity>
                     </TouchableOpacity>
                   </View>
 
@@ -542,7 +568,7 @@ export default function ProfileScreen() {
               </View>
             </TouchableOpacity>
 
-            {isPostsOpen && (
+            {/* {isPostsOpen && (
               <View className="pb-4">
                 {myPosts.length > 0 ? (
                   myPosts.map((post, idx) => (
@@ -590,7 +616,7 @@ export default function ProfileScreen() {
                   </View>
                 )}
               </View>
-            )}
+            )} */}
           </View>
         </View>
       </ScrollView>

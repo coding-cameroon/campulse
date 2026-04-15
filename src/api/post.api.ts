@@ -1,6 +1,6 @@
 // src/api/post.api.ts
 import { AxiosInstance } from "axios";
-import { Post } from "../../types"
+import { Post } from "../../types";
 
 export type GetPostsResponse = {
   data: Post[];
@@ -16,28 +16,21 @@ export type GetPostResponse = {
 };
 
 export const postApi = (axios: AxiosInstance) => ({
-  getPosts: async (params: {
-    page?: number;
-    limit?: number;
-    category?: string;
-  }): Promise<GetPostsResponse> => {
-    const { data } = await axios.get("/api/posts", { params });
-    return data;
-  },
-
-  getPost: async (id: string): Promise<GetPostResponse> => {
-    const { data } = await axios.get(`/api/posts/${id}`);
-    return data;
-  },
-
-  createPost: async (payload: FormData): Promise<GetPostResponse> => {
-    const { data } = await axios.post("/api/posts", payload, {
+  createPost: async (payload: FormData) => {
+    const { data } = await axios.post("/posts/new", payload, {
+      // ✅ multipart/form-data so multer on the server can parse
+      // images and text fields together in one request
       headers: { "Content-Type": "multipart/form-data" },
     });
     return data;
   },
 
-  deletePost: async (id: string): Promise<void> => {
-    await axios.delete(`/api/posts/${id}`);
+  getPosts: async (params: {
+    page?: number;
+    limit?: number;
+    category?: string;
+  }): Promise<GetPostsResponse> => {
+    const { data } = await axios.get("/posts", { params });
+    return data;
   },
 });

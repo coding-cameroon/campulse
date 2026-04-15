@@ -17,12 +17,12 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { CampusEvent } from "../../types";
+import { Post } from "../../types";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
 interface EventCardProps {
-  event: CampusEvent;
+  event: Post;
   onPress: () => void;
   // ✅ Screen passes this down — card just calls it with its own comments
   onCommentPress: (eventId: string) => void;
@@ -73,7 +73,7 @@ export const EventCard = ({
       {/* ── IMAGE GALLERY ── */}
       <View>
         <FlatList
-          data={event.images}
+          data={event.imageUrls}
           horizontal
           pagingEnabled
           showsHorizontalScrollIndicator={false}
@@ -94,9 +94,9 @@ export const EventCard = ({
         />
 
         {/* Image dots */}
-        {event.images.length > 1 && (
+        {event.imageUrls && event.imageUrls.length > 1 && (
           <View className="absolute bottom-3 left-0 right-0 flex-row justify-center gap-1.5">
-            {event.images.map((_, i) => (
+            {event.imageUrls.map((_, i) => (
               <View
                 key={i}
                 className="rounded-full"
@@ -122,7 +122,7 @@ export const EventCard = ({
             className="text-[10px] font-black uppercase tracking-widest"
             style={{ color: COLORS.accent }}
           >
-            {event.category}
+            {event.eventCategory}
           </Text>
         </View>
 
@@ -131,12 +131,12 @@ export const EventCard = ({
           className="absolute top-3 right-3 px-3 py-1 rounded-full"
           style={{
             backgroundColor: event.isFree
-              ? "rgba(34,197,94,0.15)"
-              : "rgba(239,68,68,0.15)",
+              ? "rgba(34,197,94,0.15)" // Subtle Green bg
+              : "rgba(239,68,68,0.15)", // Subtle Red bg
             borderWidth: 1,
             borderColor: event.isFree
-              ? "rgba(34,197,94,0.3)"
-              : "rgba(239,68,68,0.3)",
+              ? "#22c55e" // Solid Green border
+              : "#ef4444", // Solid Red border
           }}
         >
           <Text
@@ -168,7 +168,7 @@ export const EventCard = ({
           className="text-zinc-500 text-[13px] leading-5 mb-4"
           numberOfLines={2}
         >
-          {event.description}
+          {event.body}
         </Text>
 
         {/* Meta */}
@@ -184,7 +184,7 @@ export const EventCard = ({
               className="text-zinc-400 text-xs font-semibold"
               numberOfLines={1}
             >
-              {event.location}
+              {event.eventLocation}
             </Text>
           </View>
 
@@ -196,7 +196,7 @@ export const EventCard = ({
               <Clock size={11} color={COLORS.accent} />
             </View>
             <Text className="text-zinc-400 text-xs font-semibold">
-              {dayjs(event.time).format("MMM DD · hh:mm A")}
+              {dayjs(event.eventStartAt).format("MMM DD · hh:mm A")}
             </Text>
           </View>
         </View>
@@ -213,16 +213,13 @@ export const EventCard = ({
               style={{ borderWidth: 1.5, borderColor: COLORS.accent + "40" }}
             >
               <Image
-                source={{ uri: event.author.avatarUrl }}
+                source={{ uri: event.realAvatarUrl! }}
                 className="size-full"
               />
             </View>
             <View>
               <Text className="text-zinc-300 text-[12px] font-bold">
-                {event.author.fullName}
-              </Text>
-              <Text className="text-zinc-600 text-[10px] font-semibold uppercase tracking-wide">
-                {event.author.role}
+                {event.realName}
               </Text>
             </View>
           </View>
@@ -261,7 +258,7 @@ export const EventCard = ({
 
             {/* Comment — calls screen-level handler */}
             <TouchableOpacity
-              onPress={() => onCommentPress(event._id)}
+              onPress={() => onCommentPress(event.id)}
               className="flex-row gap-1.5 items-center justify-center bg-white/5 p-2 px-4 rounded-full border-[0.5px]"
               style={{ borderColor: "#1f1f1f" }}
             >

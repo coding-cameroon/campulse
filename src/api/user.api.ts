@@ -14,6 +14,12 @@ export type GetMeResponse = {
   message: string;
 };
 
+export type GetUserResponse = {
+  success: boolean;
+  data: User;
+  message: string;
+};
+
 export type DeactivateUserResponse = {
   success: boolean;
   data: User;
@@ -61,6 +67,13 @@ export const userApi = (axios: AxiosInstance) => ({
     lastname: string;
   }): Promise<UpdateNameResponse> => {
     const { data } = await axios.put("/users/update/profile-name", payload);
+    return data;
+  },
+
+  // PATCH /api/v1/users/me
+  // Updates only allowed fields — firstName, lastName, realAvatarUrl, coverImageUrl
+  getUser: async (id: string): Promise<GetUserResponse> => {
+    const { data } = await axios.get(`/users/${id}`);
     return data;
   },
 });

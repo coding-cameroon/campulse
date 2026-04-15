@@ -7,6 +7,7 @@ export const queryKeys = {
   user: {
     // ["user", "me"] — identifies the current logged-in user's data
     me: ["user", "me"] as const,
+    single: (id: string) => ["user", id] as const
   },
   posts: {
     // ["posts", { page, limit, category }] — parameterized list

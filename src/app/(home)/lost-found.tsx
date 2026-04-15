@@ -1,8 +1,9 @@
-import { dummyLostAndFound, MOCK_LOST_FOUND_COMMENTS } from "$/data/lost";
 import CustomBottomSheet from "@/components/CustomBottomSheet";
 import EmptyState from "@/components/EmptyListComponent";
 import InputField from "@/components/InputField";
 import LostAndFoundCard from "@/components/LostFoundCard";
+import { useCreateComment, useGetComments } from "@/hooks/useComment";
+import { useGetPosts } from "@/hooks/usePosts";
 import { useGetMe } from "@/hooks/useUser";
 import { COLORS } from "@/utils/colors";
 import BottomSheet from "@gorhom/bottom-sheet";
@@ -10,30 +11,42 @@ import { router } from "expo-router";
 import { Ghost, Search, X } from "lucide-react-native";
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  FlatList,
+  Image,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function LostFoundScreen() {
-  const { user } = useGetMe();
   const insets = useSafeAreaInsets();
   const [isSearching, setIsSearching] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [selectedItemId, setSelectedItemId] = useState("");
   const { t } = useTranslation("lost");
 
-  const filteredPosts = dummyLostAndFound.filter(
-    (post) =>
-      post.author.username?.includes(searchText.toLowerCase()) ||
-      post.content.toLowerCase().includes(searchText.toLowerCase()) ||
-      post.title.toLowerCase().includes(searchText.toLowerCase()) ||
-      post.author?.username?.toLowerCase().includes(searchText.toLowerCase()) ||
-      post.author?.fullName?.toLowerCase().includes(searchText.toLowerCase()) ||
-      post.location.toLowerCase().includes(searchText.toLowerCase()) ||
-      post.lastSeenLocation.toLowerCase().includes(searchText.toLowerCase()),
+  // hooks
+  const { user } = useGetMe();
+  const { comments, isPending } = useGetComments(selectedItemId as string);
+  const { mutateAsync: createComments } = useCreateComment(
+    selectedItemId as string,
   );
+  const { posts, isLoading } = useGetPosts({ category: "lost_found" });
 
-  const comments = MOCK_LOST_FOUND_COMMENTS.filter(
-    (cmt) => cmt.postId === selectedItemId,
+  // data
+  // const lostFoundPost = posts.filter((post) => post.category === "lost_found");
+  const lostFoundPost = posts;
+  const filteredPosts = lostFoundPost.filter(
+    (post) =>
+      post.realName?.includes(searchText.toLowerCase()) ||
+      post.body.toLowerCase().includes(searchText.toLowerCase()) ||
+      (post.title &&
+        post.title.toLowerCase().includes(searchText.toLowerCase())) ||
+      (post.lastSeenAt &&
+        post.lastSeenAt.toLowerCase().includes(searchText.toLowerCase())),
   );
 
   const sheetRef = useRef<BottomSheet>(null);
@@ -43,10 +56,16 @@ export default function LostFoundScreen() {
     sheetRef.current?.expand();
   }, []);
 
-  const handleSubmit = (text: string) => {
-    alert(text);
+  const handleSubmit = async (text: string) => {
+    try {
+      await createComments({ postId: selectedItemId, newComment: text });
+      console.log("✅ Comment created.");
+    } catch (err) {
+      console.log("create comment filed: ", err);
+    }
   };
 
+  // HEADER COMPONENT
   const Header = useMemo(
     () => (
       /* We add padding top based on the device's notch/status bar height */
@@ -115,44 +134,52 @@ export default function LostFoundScreen() {
     [isSearching],
   );
 
+  // MAIN SCREEN CONTENT
   return (
     <View className="flex-1 bg-black">
-      <FlatList
-        data={filteredPosts}
-        keyExtractor={(item) => item._id}
-        renderItem={({ item }) => (
-          <LostAndFoundCard
-            post={item}
-            onPressItem={() => handleOpenSheet(item._id)}
-          />
-        )}
-        ListEmptyComponent={
-          <EmptyState
-            title={searchText ? "No matches found" : "No posts yet"}
-            description={
-              searchText
-                ? `We couldn't find anything for "${searchText}".`
-                : "Be the first to post something!"
-            }
-            Icon={searchText ? Search : Ghost}
-            showAction={searchText.length > 0}
-            actionText="Clear Search"
-            onAction={() => {
-              setSearchText("");
-              setIsSearching(false);
-            }}
-          />
-        }
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{
-          paddingTop: insets.top + 160,
-          paddingBottom: 5,
-          paddingHorizontal: 8,
-        }}
-      />
+      {isLoading ? (
+        <View className="flex-1 justify-center items-center">
+          <ActivityIndicator size={40} color={"#505152"} />
+          <Text className="text-xl font-bold text-[#505152]">Loading</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={filteredPosts}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <LostAndFoundCard
+              post={item}
+              onPressItem={() => handleOpenSheet(item.id)}
+            />
+          )}
+          ListEmptyComponent={
+            <EmptyState
+              title={searchText ? "No matches found" : "No posts yet"}
+              description={
+                searchText
+                  ? `We couldn't find anything for "${searchText}".`
+                  : "Be the first to post something!"
+              }
+              Icon={searchText ? Search : Ghost}
+              showAction={searchText.length > 0}
+              actionText="Clear Search"
+              onAction={() => {
+                setSearchText("");
+                setIsSearching(false);
+              }}
+            />
+          }
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{
+            paddingTop: insets.top + 160,
+            paddingBottom: 5,
+            paddingHorizontal: 8,
+          }}
+        />
+      )}
       {Header}
       <CustomBottomSheet
-        comments={comments}
+        comments={comments ?? []}
         onSendComment={handleSubmit}
         ref={sheetRef}
       />

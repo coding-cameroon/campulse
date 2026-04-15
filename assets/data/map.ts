@@ -1,285 +1,63 @@
-import { CampusEvent, InitialRegion, Polygon } from "../../types";
+// import { CampusEvent, InitialRegion, Polygon } from "../../types";
 
-export const iutDoualaPolygon: Polygon[] = [
-  {
-    longitude: 9.743644930422306,
-    latitude: 4.053581711694047,
-  },
-  {
-    longitude: 9.74260825663805,
-    latitude: 4.054618466948154,
-  },
-  {
-    longitude: 9.74209327250719,
-    latitude: 4.055444860264423,
-  },
-  {
-    longitude: 9.740638844668865,
-    latitude: 4.056651506696829,
-  },
-  {
-    longitude: 9.74025595933199,
-    latitude: 4.058162487686878,
-  },
-  {
-    longitude: 9.74120881408453,
-    latitude: 4.058923996955125,
-  },
-  {
-    longitude: 9.74198766052723,
-    latitude: 4.059117969337328,
-  },
-  {
-    longitude: 9.741756655275822,
-    latitude: 4.060168094873228,
-  },
-  {
-    longitude: 9.742961972951889,
-    latitude: 4.059125661344633,
-  },
-  {
-    longitude: 9.745396077632904,
-    latitude: 4.057847783822613,
-  },
-  {
-    longitude: 9.745305217802525,
-    latitude: 4.057538096372078,
-  },
-  {
-    longitude: 9.746449515223503,
-    latitude: 4.056313391705833,
-  },
-  {
-    longitude: 9.743659012019634,
-    latitude: 4.0536967581491234,
-  },
-];
+// export const iutDoualaPolygon: Polygon[] = [
+//   {
+//     longitude: 9.743644930422306,
+//     latitude: 4.053581711694047,
+//   },
+//   {
+//     longitude: 9.74260825663805,
+//     latitude: 4.054618466948154,
+//   },
+//   {
+//     longitude: 9.74209327250719,
+//     latitude: 4.055444860264423,
+//   },
+//   {
+//     longitude: 9.740638844668865,
+//     latitude: 4.056651506696829,
+//   },
+//   {
+//     longitude: 9.74025595933199,
+//     latitude: 4.058162487686878,
+//   },
+//   {
+//     longitude: 9.74120881408453,
+//     latitude: 4.058923996955125,
+//   },
+//   {
+//     longitude: 9.74198766052723,
+//     latitude: 4.059117969337328,
+//   },
+//   {
+//     longitude: 9.741756655275822,
+//     latitude: 4.060168094873228,
+//   },
+//   {
+//     longitude: 9.742961972951889,
+//     latitude: 4.059125661344633,
+//   },
+//   {
+//     longitude: 9.745396077632904,
+//     latitude: 4.057847783822613,
+//   },
+//   {
+//     longitude: 9.745305217802525,
+//     latitude: 4.057538096372078,
+//   },
+//   {
+//     longitude: 9.746449515223503,
+//     latitude: 4.056313391705833,
+//   },
+//   {
+//     longitude: 9.743659012019634,
+//     latitude: 4.0536967581491234,
+//   },
+// ];
 
-export const iutRegion: InitialRegion = {
+export const iutRegion = {
   longitude: 9.745521135628223,
   latitude: 4.05613747821242,
   latitudeDelta: 0.005,
   longitudeDelta: 0.005,
 };
-
-export const MOCK_CAMPUS_EVENTS: CampusEvent[] = [
-  {
-    _id: "6606f1a1e4b0a1a1a1a1a1a1",
-    title: "Freshman Welcome Party",
-    location: "Main Entrance Esplanade",
-    coordinate: { latitude: 4.0536, longitude: 9.7436 },
-    time: "2026-04-10T18:30:00Z",
-    description:
-      "The biggest welcome party for all new students at IUT. Music, snacks, and networking.",
-    category: "Social",
-    isFree: false,
-    price: 2000,
-    phoneNumber: "680342873",
-    author: {
-      _id: "auth_01",
-      fullName: "IUT Student Council",
-      email: "council@iut-douala.cm",
-      role: "Student Organization",
-      avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=Council",
-    },
-    images: [
-      "https://picsum.photos/seed/party1/800/600",
-      "https://picsum.photos/seed/party1/800/600",
-      "https://picsum.photos/seed/party1/800/600",
-      "https://picsum.photos/seed/party2/800/600",
-    ],
-    createdAt: "2026-03-29T08:00:00Z",
-    updatedAt: "2026-03-29T08:00:00Z",
-  },
-  {
-    _id: "6606f1a1e4b0a1a1a1a1a1a2",
-    title: "React Native Masterclass",
-    location: "GI Department Lab 4",
-    coordinate: { latitude: 4.0554, longitude: 9.7421 },
-    time: "2026-04-12T10:00:00Z",
-    description:
-      "Learn how to build mobile apps with Expo and Tailwind CSS. Bring your laptop!",
-    category: "Tech",
-    isFree: true,
-    phoneNumber: "680342873",
-    author: {
-      _id: "auth_02",
-      fullName: "Tech Club IUT",
-      email: "techclub@iut-douala.cm",
-      role: "Department Club",
-      username: "tech_iut",
-    },
-    images: ["https://picsum.photos/seed/tech1/800/600"],
-    createdAt: "2026-03-28T14:20:00Z",
-    updatedAt: "2026-03-28T14:20:00Z",
-  },
-  {
-    _id: "6606f1a1e4b0a1a1a1a1a1a3",
-    title: "Inter-Level Football Finals",
-    location: "IUT Sports Ground",
-    coordinate: { latitude: 4.0591, longitude: 9.7419 },
-    time: "2026-04-15T16:00:00Z",
-    description:
-      "Final match between Level 1 and Level 2 Engineering students.",
-    category: "Sports",
-    isFree: true,
-    phoneNumber: "680342873",
-    author: {
-      _id: "auth_03",
-      fullName: "Sports Director",
-      email: "sports@iut-douala.cm",
-      role: "Staff",
-      avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sports",
-    },
-    images: ["https://picsum.photos/seed/sports1/800/600"],
-    createdAt: "2026-03-27T09:00:00Z",
-    updatedAt: "2026-03-27T10:00:00Z",
-  },
-  {
-    _id: "6606f1a1e4b0a1a1a1a1a1a4",
-    title: "Career Talk: UI/UX Design",
-    location: "Amphi 200",
-    coordinate: { latitude: 4.0581, longitude: 9.7402 },
-    time: "2026-04-18T09:00:00Z",
-    description:
-      "A professional from a top Douala agency talks about landing your first design job.",
-    category: "Career",
-    isFree: true,
-    phoneNumber: "680342873",
-    author: {
-      _id: "auth_04",
-      fullName: "Career Services",
-      email: "careers@iut-douala.cm",
-      role: "Administration",
-    },
-    images: ["https://picsum.photos/seed/career1/800/600"],
-    createdAt: "2026-03-25T11:00:00Z",
-    updatedAt: "2026-03-25T11:00:00Z",
-  },
-  {
-    _id: "6606f1a1e4b0a1a1a1a1a1a5",
-    title: "Entrepreneurship Seminar",
-    location: "Management Block",
-    coordinate: { latitude: 4.0566, longitude: 9.7406 },
-    time: "2026-04-20T14:00:00Z",
-    description:
-      "How to register a business in Cameroon as a student entrepreneur.",
-    category: "Career",
-    isFree: false,
-    price: 5000,
-    phoneNumber: "680342873",
-    author: {
-      _id: "auth_05",
-      fullName: "Dr. Kamga",
-      email: "kamga@iut-douala.cm",
-      role: "Lecturer",
-    },
-    images: ["https://picsum.photos/seed/business/800/600"],
-    createdAt: "2026-03-29T12:00:00Z",
-    updatedAt: "2026-03-29T12:00:00Z",
-  },
-  {
-    _id: "6606f1a1e4b0a1a1a1a1a1a6",
-    title: "AI Ethics Debate",
-    location: "Small Amphi",
-    coordinate: { latitude: 4.0546, longitude: 9.7426 },
-    time: "2026-04-22T11:00:00Z",
-    description:
-      "Is AI a threat to junior developers? A heated debate between students.",
-    category: "Academic",
-    isFree: true,
-    phoneNumber: "680342873",
-    author: {
-      _id: "auth_02",
-      fullName: "Tech Club IUT",
-      email: "techclub@iut-douala.cm",
-      role: "Department Club",
-    },
-    images: ["https://picsum.photos/seed/debate/800/600"],
-    createdAt: "2026-03-20T15:00:00Z",
-    updatedAt: "2026-03-20T15:00:00Z",
-  },
-  {
-    _id: "6606f1a1e4b0a1a1a1a1a1a7",
-    title: "Cultural Day Expo",
-    location: "Student Center",
-    coordinate: { latitude: 4.0575, longitude: 9.7453 },
-    time: "2026-04-25T10:00:00Z",
-    description:
-      "Display of traditional foods and attire from all 10 regions of Cameroon.",
-    category: "Social",
-    isFree: true,
-    phoneNumber: "680342873",
-    author: {
-      _id: "auth_01",
-      fullName: "IUT Student Council",
-      email: "council@iut-douala.cm",
-      role: "Student Organization",
-    },
-    images: ["https://picsum.photos/seed/culture/800/600"],
-    createdAt: "2026-03-29T07:00:00Z",
-    updatedAt: "2026-03-29T07:00:00Z",
-  },
-  {
-    _id: "6606f1a1e4b0a1a1a1a1a1a8",
-    title: "Physics Revision Session",
-    location: "Lab Block B",
-    coordinate: { latitude: 4.0589, longitude: 9.7412 },
-    time: "2026-04-27T08:00:00Z",
-    description: "Intensive revision for the upcoming semester exams.",
-    category: "Academic",
-    isFree: true,
-    phoneNumber: "680342873",
-    author: {
-      _id: "auth_06",
-      fullName: "Academic Committee",
-      email: "academic@iut-douala.cm",
-      role: "Student Body",
-    },
-    images: ["https://picsum.photos/seed/physics/800/600"],
-    createdAt: "2026-03-29T10:00:00Z",
-    updatedAt: "2026-03-29T10:00:00Z",
-  },
-  {
-    _id: "6606f1a1e4b0a1a1a1a1a1a9",
-    title: "Basketball 3x3 Tournament",
-    location: "Basketball Court",
-    coordinate: { latitude: 4.0578, longitude: 9.7453 },
-    time: "2026-05-02T15:00:00Z",
-    description: "Fast-paced basketball tournament. Prize pool: 50,000 CFA.",
-    category: "Sports",
-    isFree: false,
-    price: 1000,
-    phoneNumber: "680342873",
-    author: {
-      _id: "auth_03",
-      fullName: "Sports Director",
-      email: "sports@iut-douala.cm",
-      role: "Staff",
-    },
-    images: ["https://picsum.photos/seed/basketball/800/600"],
-    createdAt: "2026-03-29T11:00:00Z",
-    updatedAt: "2026-03-29T11:00:00Z",
-  },
-  {
-    _id: "6606f1a1e4b0a1a1a1a1a1b0",
-    title: "Cloud Computing Workshop",
-    location: "Innovation Hub",
-    coordinate: { latitude: 4.0563, longitude: 9.7464 },
-    time: "2026-05-05T09:00:00Z",
-    description: "Introduction to AWS and Azure for engineering students.",
-    category: "Tech",
-    isFree: false,
-    price: 3000,
-    phoneNumber: "680342873",
-    author: {
-      _id: "auth_02",
-      fullName: "Tech Club IUT",
-      email: "techclub@iut-douala.cm",
-      role: "Department Club",
-    },
-    images: ["https://picsum.photos/seed/cloud/800/600"],
-    createdAt: "2026-03-29T13:00:00Z",
-    updatedAt: "2026-03-29T13:00:00Z",
-  },
-];

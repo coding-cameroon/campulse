@@ -1,4 +1,3 @@
-import { MOCK_CAMPUS_EVENTS } from "$/data/map";
 import { COLORS } from "@/utils/colors";
 import { Fontisto } from "@expo/vector-icons";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
@@ -16,21 +15,22 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from "react-native-maps";
-import {
-  CampusEvent,
-  EventCategory,
-  InitialRegion,
-  Polygon,
-} from "../../types/index";
+import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
+import { EventCategory, Post } from "../../types";
+
+type InitialRegion = {
+  longitude: number;
+  latitude: number;
+  latitudeDelta: number;
+  longitudeDelta: number;
+};
 
 interface MapProps {
-  markers?: CampusEvent[];
+  markers?: Post[];
   iutRegion?: InitialRegion;
-  iutDoualaPolygon?: Polygon[];
 }
 
-const GoogleMap = ({ iutRegion, iutDoualaPolygon, markers }: MapProps) => {
+const GoogleMap = ({ iutRegion, markers }: MapProps) => {
   const getMarkerColor = (category: EventCategory) => {
     switch (category) {
       case "Tech":
@@ -48,13 +48,13 @@ const GoogleMap = ({ iutRegion, iutDoualaPolygon, markers }: MapProps) => {
 
   const snapPoints = useMemo(() => ["25%", "50%", "70%", "80%"], []);
   const sheetRef = useRef<BottomSheet>(null);
-  const [event, setEvent] = useState<CampusEvent>();
+  const [event, setEvent] = useState<Post>();
   const [activeImg, setActiveImg] = useState<string | null>();
 
   const handleOpenSheet = (id: string) => {
     sheetRef.current?.snapToIndex(2);
 
-    const filteredEvents = MOCK_CAMPUS_EVENTS.find((event) => event._id === id);
+    const filteredEvents = markers!.find((event) => event.id === id);
     setEvent(filteredEvents);
 
     setActiveImg("");
@@ -68,8 +68,8 @@ const GoogleMap = ({ iutRegion, iutDoualaPolygon, markers }: MapProps) => {
     const cleanNumber = phoneNumber.trim();
     const message = `Hello! I'm interested in the event: *${event?.title}* 🗓️
 
-📍 *Location:* ${event?.location}
-⏰ *Time:* ${dayjs(event?.time).format("MMM D, YYYY h:mm A").toUpperCase()}
+📍 *Location:* ${event?.eventLocation}
+⏰ *Time:* ${dayjs(event?.eventStartAt).format("MMM D, YYYY h:mm A").toUpperCase()}
 💰 *Entry:* ${event?.isFree ? "Free" : `${event?.price} CFA`}
 
 I'd like to get more information or confirm my attendance. Looking forward to your reply!`;
@@ -96,30 +96,20 @@ I'd like to get more information or confirm my attendance. Looking forward to yo
         showsUserLocation={true}
         showsMyLocationButton={true}
         mapType="hybrid"
-        // onLongPress={(e) =>
-        //   console.log(JSON.stringify(e.nativeEvent.coordinate))
-        // }
         onMarkerPress={(e) => handleOpenSheet(e.nativeEvent.id)}
       >
-        {/* The Pathway */}
-        {iutDoualaPolygon && (
-          <Polyline
-            coordinates={iutDoualaPolygon}
-            strokeColor="#f97316"
-            strokeWidth={6}
-            lineDashPattern={[1]}
-          />
-        )}
-
         {markers &&
-          markers.map((marker: CampusEvent) => (
+          markers.map((marker: Post) => (
             <Marker
-              key={marker._id}
-              title={marker.title}
-              identifier={marker._id}
-              coordinate={marker.coordinate}
-              pinColor={getMarkerColor(marker.category)}
-              description={`${marker.location} • ${marker.isFree ? "Free" : marker.price + " CFA"}`}
+              key={marker.id}
+              title={marker.title as string}
+              identifier={marker.id}
+              coordinate={{
+                latitude: marker.mapCoordinates?.lat!,
+                longitude: marker.mapCoordinates?.lng!,
+              }}
+              pinColor={getMarkerColor(marker.eventCategory!)}
+              description={`${marker.eventLocation} • ${marker.isFree ? "Free" : marker.price + " CFA"}`}
             />
           ))}
       </MapView>
@@ -156,7 +146,7 @@ I'd like to get more information or confirm my attendance. Looking forward to yo
                     </View>
                     <Text className="text-zinc-500 text-xs">•</Text>
                     <Text className="text-zinc-400 text-xs">
-                      Hosted by {event?.author.fullName.split(" ")[0]}
+                      Hosted by {event?.realName}
                     </Text>
                   </View>
                 </View>
@@ -187,7 +177,7 @@ I'd like to get more information or confirm my attendance. Looking forward to yo
                       Time
                     </Text>
                     <Text className="text-white text-sm font-medium uppercase">
-                      {dayjs(event?.time).format("MMM D, YYYY h:mm A")}
+                      {dayjs(event?.eventStartAt).format("MMM D, YYYY h:mm A")}
                     </Text>
                   </View>
                 </View>
@@ -205,7 +195,7 @@ I'd like to get more information or confirm my attendance. Looking forward to yo
                       className="text-white text-sm font-medium"
                       numberOfLines={1}
                     >
-                      {event?.location}
+                      {event?.eventLocation}
                     </Text>
                   </View>
                 </View>
@@ -234,47 +224,53 @@ I'd like to get more information or confirm my attendance. Looking forward to yo
                   About Event
                 </Text>
                 <Text className="text-zinc-300 text-[15px] leading-6">
-                  {event?.description ||
-                    "No description provided for this event."}
+                  {event?.body || "No description provided for this event."}
                 </Text>
               </View>
 
-              {/* ORGANIZER MINI CARD */}
-              <View className="bg-zinc-900/50 p-4 rounded-3xl border border-zinc-800 flex-row mb-10">
-                <Image
-                  source={{ uri: activeImg || event?.images[0] }}
-                  style={{ width: "100%", height: 300, borderRadius: 10 }}
-                />
-              </View>
+              {/* MAIN IMAGE DISPLAY - ONLY SHOWS IF IMAGES EXIST */}
+              {event?.imageUrls && event.imageUrls.length > 0 && (
+                <View className="bg-zinc-900/50 p-4 rounded-3xl border border-zinc-800 flex-row mb-10">
+                  <Image
+                    source={{ uri: activeImg || event.imageUrls[0] }}
+                    style={{ width: "100%", height: 300, borderRadius: 10 }}
+                  />
+                </View>
+              )}
             </ScrollView>
+
+            {/* THUMBNAILS - ONLY SHOWS IF IMAGES EXIST */}
+            {event?.imageUrls && event.imageUrls.length > 0 && (
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{
+                  paddingHorizontal: 16,
+                  alignItems: "center",
+                  gap: 8,
+                }}
+                className="bg-zinc-900/50 py-4 border-t border-zinc-800 flex-row"
+              >
+                {event.imageUrls.map((img, idx) => (
+                  <TouchableOpacity
+                    key={`${img}-${idx}`}
+                    onPress={() => setActiveImg(img)}
+                  >
+                    <Image
+                      source={{ uri: img }}
+                      style={[
+                        { width: 50, height: 50, borderRadius: 10 },
+                        activeImg === img
+                          ? { borderWidth: 2, borderColor: COLORS.accent }
+                          : null,
+                      ]}
+                    />
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            )}
 
             {/* FOOTER ACTION */}
-
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{
-                width: "100%",
-                alignItems: "center",
-                gap: 8,
-              }}
-              className="bg-zinc-900/50 p-4 rounded-3xl border border-zinc-800 flex-row mb-10"
-            >
-              {event?.images.map((img, idx) => (
-                <TouchableOpacity onPress={() => setActiveImg(img)}>
-                  <Image
-                    key={img + idx + Date.now()}
-                    source={{ uri: img }}
-                    style={[
-                      { width: 50, height: 50, borderRadius: 10 },
-                      activeImg === img
-                        ? { borderWidth: 2, borderColor: COLORS.accent }
-                        : "",
-                    ]}
-                  />
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
             <View
               className="px-4 pt-4 border-t border-zinc-900"
               style={{ paddingBottom: 20 }}
@@ -282,7 +278,7 @@ I'd like to get more information or confirm my attendance. Looking forward to yo
               <TouchableOpacity
                 activeOpacity={0.8}
                 className="bg-accent flex-row gap-2 h-14 rounded-2xl items-center justify-center shadow-lg shadow-accent/20"
-                onPress={() => openWhatsApp(event?.phoneNumber as string)}
+                onPress={() => openWhatsApp(String(event?.phoneNumber))}
               >
                 <Fontisto name="whatsapp" size={20} color="black" />
                 <Text className="text-black text-lg font-black italic uppercase">

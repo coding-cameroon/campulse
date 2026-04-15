@@ -1,30 +1,30 @@
-// src/hooks/usePosts.ts
 import { postApi } from "@/api/post.api";
 import { useAxios } from "@/lib/axios";
 import { queryKeys } from "@/lib/queryKeys";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-export const useGetPosts = (params: {
+type GetPostsParams = {
   page?: number;
   limit?: number;
   category?: string;
-}) => {
-  const axios = useAxios();
-
-  return useQuery({
-    queryKey: queryKeys.posts.all(params),
-    queryFn: () => postApi(axios).getPosts(params),
-  });
 };
 
-export const useGetPost = (id: string) => {
+export const useGetPosts = (params: GetPostsParams = {}) => {
   const axios = useAxios();
+  const { page = 1, limit = 20, category } = params;
 
-  return useQuery({
-    queryKey: queryKeys.posts.single(id),
-    queryFn: () => postApi(axios).getPost(id),
-    enabled: !!id,
+  const query = useQuery({
+    // ✅ params go INSIDE the key — different params = different cache entries
+    queryKey: queryKeys.posts.all({ page, limit, category }),
+    // ✅ queryFn receives context from React Query — your params come from closure
+    queryFn: () => postApi(axios).getPosts({ page, limit, category }),
   });
+
+  return {
+    ...query,
+    // ✅ safely access nested data
+    posts: query.data?.data ?? [],
+  };
 };
 
 export const useCreatePost = () => {
@@ -36,17 +36,11 @@ export const useCreatePost = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["posts"] });
     },
-  });
-};
-
-export const useDeletePost = () => {
-  const axios = useAxios();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (id: string) => postApi(axios).deletePost(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["posts"] });
+    onError: (error: any) => {
+      console.error(
+        "Create post failed:",
+        error?.response?.data || error?.message,
+      );
     },
   });
 };

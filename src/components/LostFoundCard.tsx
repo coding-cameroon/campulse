@@ -1,3 +1,4 @@
+import { Fontisto } from "@expo/vector-icons";
 import {
   BrickWallFire,
   Heart,
@@ -5,8 +6,9 @@ import {
   MessageCircleMore,
   Phone,
 } from "lucide-react-native";
-import React, { useRef, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import {
+  Alert,
   Animated,
   Dimensions,
   FlatList,
@@ -18,9 +20,7 @@ import {
 } from "react-native";
 
 import { formatDate, getTimeLeft } from "@/utils/date";
-import { Fontisto } from "@expo/vector-icons";
-import { Alert } from "react-native";
-import { LostAndFoundPost } from "../../types";
+import { Post } from "../../types";
 import SimpleImageAlert from "./ImageOverLay";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
@@ -29,18 +29,27 @@ const LostAndFoundCard = ({
   post,
   onPressItem,
 }: {
-  post: LostAndFoundPost;
+  post: Post;
   onPressItem: () => void;
 }) => {
   const [selectedImg, setSelectedImg] = useState<string | null>(null);
-  const [likesCount, setLikesCount] = useState(post.likesCount || 0);
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [isLiked, setIsLiked] = useState(false); // 1. Track like state locally
+  const [likesCount, setLikesCount] = useState(post.reactionCount ?? 0);
+  const [isLiked, setIsLiked] = useState(false);
 
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
+  // Optimized style calculation
+  const statusConfig = useMemo(() => {
+    const isLost = post.itemStatus === "lost";
+    return {
+      container: isLost
+        ? "bg-red-500/10 border-red-500/40"
+        : "bg-green-500/10 border-green-500/40",
+      text: isLost ? "text-red-500" : "text-green-500",
+    };
+  }, [post.itemStatus]);
+
   const handleLike = () => {
-    // setLikesCount((prev) => prev + 1);
     if (isLiked) {
       setLikesCount((prev) => prev - 1);
       setIsLiked(false);
@@ -48,6 +57,7 @@ const LostAndFoundCard = ({
       setLikesCount((prev) => prev + 1);
       setIsLiked(true);
     }
+
     Animated.sequence([
       Animated.spring(scaleAnim, {
         toValue: 1.4,
@@ -63,71 +73,51 @@ const LostAndFoundCard = ({
   };
 
   const handleWhatsApp = () => {
-    const cleanNumber = post.contactNumber.replace(/[^\d]/g, "");
-
-    const fullNumber = cleanNumber.startsWith("237")
-      ? cleanNumber
-      : `237${cleanNumber}`;
-
-    const message = `Hello! I'm reaching out regarding the *Lost & Found* post for: *${post.title}* 🔍
-
-📍 *Found at/near:* ${post.location}
-📝 *Description:* ${post.content}
-
-I believe this belongs to me (or I have found this item). Please let me know how we can coordinate the return. Thank you!`;
-
-    const url = `whatsapp://send?phone=${fullNumber}&text=${encodeURIComponent(message)}`;
+    const message = `Hello! I'm reaching out regarding the *Lost & Found* post for: *${post.title}* 🔍\n\n📍 *Found at/near:* ${post.lastSeenAt}\n📝 *Description:* ${post.body}`;
+    // Using string template for phone number to prevent overflow issues
+    const phoneStr = `${post.phoneNumber}`;
+    const url = `whatsapp://send?phone=${phoneStr}&text=${encodeURIComponent(message)}`;
 
     Linking.canOpenURL(url).then((supported) => {
-      if (supported) {
-        Linking.openURL(url);
-      } else {
-        Linking.openURL(
-          `https://wa.me/${fullNumber}?text=${encodeURIComponent(message)}`,
-        );
-      }
+      const targetUrl = supported
+        ? url
+        : `https://wa.me/${phoneStr}?text=${encodeURIComponent(message)}`;
+      Linking.openURL(targetUrl);
     });
   };
 
   const handleCall = () => {
-    const cleanNumber = post.contactNumber.replace(/[^\d+]/g, "");
-    const url = `tel:${cleanNumber}`;
-
+    const url = `tel:${post.phoneNumber}`;
     Linking.canOpenURL(url).then((supported) => {
-      if (supported) {
-        Linking.openURL(url);
-      } else {
-        Alert.alert("Error", "Phone calls are not supported on this device.");
-      }
+      supported
+        ? Linking.openURL(url)
+        : Alert.alert("Error", "Calling not supported.");
     });
   };
 
   return (
     <View className="flex-row gap-3 items-start justify-center mb-8 px-2">
-      {/* User Avatar using Author Type */}
-      <View className="overflow-hidden rounded-full border border-gray-800">
+      {/* Avatar Section */}
+      <View className="overflow-hidden rounded-full border border-gray-800 bg-dark-1">
         <Image
           source={
-            post.author.avatarUrl
-              ? { uri: post.author.avatarUrl }
+            post.realAvatarUrl
+              ? { uri: post.realAvatarUrl }
               : require("$/images/icon.png")
           }
-          className="w-[35px] h-[35px]"
+          className="w-9 h-9"
           resizeMode="cover"
         />
       </View>
 
       <View className="flex-1 rounded-2xl overflow-hidden border-[0.5px] border-dark-1 bg-dark-2/60">
-        {/* Header - Using fullName and username */}
+        {/* Header */}
         <View className="flex-row items-center justify-between p-3 pb-1">
           <View className="flex-1 mr-2 flex-row gap-2 items-center">
-            <Text
-              className="text-[16px] font-bold text-white"
-              numberOfLines={1}
-            >
-              {post.author.fullName || post.author.username}
+            <Text className="text-base font-bold text-white" numberOfLines={1}>
+              {post.realName || post.anonName}
             </Text>
-            <Text className="text-sm font-bold text-gray">
+            <Text className="text-xs font-bold text-gray">
               • {formatDate(post.createdAt)}
             </Text>
           </View>
@@ -135,35 +125,30 @@ I believe this belongs to me (or I have found this item). Please let me know how
           <View className="flex-row items-center gap-1 bg-orange-500/10 rounded-full border-[0.5px] border-orange-500/50 p-1 px-3">
             <BrickWallFire size={12} color="#f97316" />
             <Text className="text-orange-500 text-[10px] font-black uppercase">
-              {getTimeLeft(post.expiresAt)}
+              {getTimeLeft(post.expiresAt as Date)}
             </Text>
           </View>
         </View>
 
-        {/* Post Content */}
+        {/* Content */}
         <View className="px-3 py-2">
-          <Text className="text-[17px] text-white font-bold leading-5 mb-2">
+          <Text className="text-lg text-white font-bold leading-5 mb-1">
             {post.title}
           </Text>
-          <Text className="text-[15px] text-white font-medium leading-5">
-            {post.content}
+          <Text className="text-[15px] text-white/90 font-medium leading-5">
+            {post.body}
           </Text>
         </View>
 
-        {/* Multiple Images */}
-        {post.images && post.images.length > 0 && (
+        {/* Image Carousel */}
+        {post.imageUrls && post.imageUrls.length > 0 && (
           <View>
             <FlatList
-              data={post.images}
+              data={post.imageUrls}
               horizontal
               pagingEnabled
               showsHorizontalScrollIndicator={false}
-              onMomentumScrollEnd={(e) => {
-                const index = Math.round(
-                  e.nativeEvent.contentOffset.x / (SCREEN_WIDTH * 0.7),
-                );
-                setActiveIndex(index);
-              }}
+              keyExtractor={(item, index) => `${item}-${index}`}
               renderItem={({ item }) => (
                 <TouchableOpacity
                   activeOpacity={0.9}
@@ -173,9 +158,9 @@ I believe this belongs to me (or I have found this item). Please let me know how
                 >
                   <Image
                     source={{ uri: item }}
-                    className="w-full rounded-xl"
+                    className="w-full rounded-xl bg-dark-1"
                     style={{ aspectRatio: 1 }}
-                    resizeMode="contain"
+                    resizeMode="cover"
                   />
                 </TouchableOpacity>
               )}
@@ -183,43 +168,56 @@ I believe this belongs to me (or I have found this item). Please let me know how
           </View>
         )}
 
-        {/* Location & Time */}
-        <View className="px-3 mb-1 mt-2">
-          <View className="flex-row items-center gap-1">
-            <MapPin size={13} color="#fff" />
-            <Text className="text-gray text-xs font-bold uppercase">
-              found at{" "}
+        {/* Meta Info */}
+        <View className="px-3 mb-1 mt-2 flex-row items-center justify-between">
+          <View className="flex-row items-center gap-1.5 flex-1 mr-2">
+            <MapPin size={13} color="#9ca3af" />
+            <Text className="text-gray text-[10px] font-bold uppercase tracking-tighter">
+              found at
             </Text>
-            <Text className="text-gray-400 text-lg font-bold text-white">
-              {post.location}
+            <Text
+              className="text-white text-md font-bold flex-1"
+              numberOfLines={1}
+            >
+              {post.lastSeenAt}
+            </Text>
+          </View>
+
+          <View
+            className={`p-1 px-4 rounded-full border-[0.5px] ${statusConfig.container}`}
+          >
+            <Text
+              className={`text-[10px] font-black uppercase tracking-widest ${statusConfig.text}`}
+            >
+              {post.itemStatus}
             </Text>
           </View>
         </View>
 
-        {/* Footer */}
-        <View className="flex-row items-center justify-between px-3 mb-4 mt-1">
-          <View className="flex-row gap-3 mt-4">
-            {/* Phone Call Button */}
+        {/* Centered Footer Buttons */}
+        <View className="flex-row w-full items-center justify-between py-4 px-3">
+          <View className="flex-row items-center justify-center gap-3">
+            {/* Contact Actions */}
             <TouchableOpacity
-              onPress={handleCall} // Assuming you have a separate call handler
+              onPress={handleCall}
               className="bg-blue-500/10 p-2.5 px-5 rounded-full border-[0.5px] border-blue-500/40"
             >
-              <Phone size={16} color="#3b82f6" strokeWidth={2.5} />
+              <Phone size={18} color="#3b82f6" strokeWidth={2.5} />
             </TouchableOpacity>
 
-            {/* WhatsApp Button */}
             <TouchableOpacity
               onPress={handleWhatsApp}
               className="bg-green-500/10 p-2.5 px-5 rounded-full border-[0.5px] border-green-500/40"
             >
-              <Fontisto name="whatsapp" size={16} color="#22c55e" />
+              <Fontisto name="whatsapp" size={18} color="#22c55e" />
             </TouchableOpacity>
           </View>
 
-          <View className="flex-row gap-3">
+          <View className="flex-row items-center justify-center gap-3">
+            {/* Engagement Actions */}
             <TouchableOpacity
               onPress={handleLike}
-              className="flex-row gap-1.5 items-center bg-white/5 p-2 px-4 rounded-full border-[0.5px] border-dark-1"
+              className="flex-row gap-2 items-center bg-white/5 p-2.5 px-5 rounded-full border-[0.5px] border-dark-1"
             >
               <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
                 <Heart
@@ -233,10 +231,12 @@ I believe this belongs to me (or I have found this item). Please let me know how
 
             <TouchableOpacity
               onPress={onPressItem}
-              className="flex-row gap-1.5 items-center bg-white/5 p-2 px-4 rounded-full border-[0.5px] border-dark-1"
+              className="flex-row gap-2 items-center bg-white/5 p-2.5 px-5 rounded-full border-[0.5px] border-dark-1"
             >
               <MessageCircleMore size={18} color="white" />
-              <Text className="font-bold text-xs text-white">{likesCount}</Text>
+              <Text className="font-bold text-xs text-white">
+                {post.commentCount ?? 0}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>

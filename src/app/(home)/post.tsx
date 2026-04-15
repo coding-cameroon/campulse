@@ -1,37 +1,58 @@
-import { MOCK_COMMENTS } from "$/data/comments";
-import { MOCK_POSTS } from "$/data/post";
 import CustomBottomSheet from "@/components/CustomBottomSheet";
+import EmptyState from "@/components/EmptyListComponent";
 import InputField from "@/components/InputField";
 import PostCard from "@/components/PostCard";
+import { useCreateComment, useGetComments } from "@/hooks/useComment";
+import { useGetPosts } from "@/hooks/usePosts";
 import { useGetMe } from "@/hooks/useUser";
 import { COLORS } from "@/utils/colors";
 import BottomSheet from "@gorhom/bottom-sheet";
+import { router } from "expo-router";
 import { Search, X } from "lucide-react-native";
 import React, { useCallback, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  FlatList,
+  Image,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function PostScreen() {
-  const { user } = useGetMe();
+  const { posts, isPending: isPostPending } = useGetPosts({ category: "feed" });
   const insets = useSafeAreaInsets();
   const [searchText, setSearchText] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
 
+  // HOOKS
+  const { user } = useGetMe();
+  const { mutateAsync: createComment, isPending: isCreateCommentPending } =
+    useCreateComment(selectedPostId as string);
+  const { comments, isPending: isCommentPending } = useGetComments(
+    selectedPostId as string,
+  );
+
   const { t } = useTranslation("wall");
 
   const sheetRef = useRef<BottomSheet>(null);
 
-  const eventComments = MOCK_COMMENTS.filter(
-    (cmt) => cmt.postId === selectedPostId,
-  );
+  const handleAddEventComment = async (text: string) => {
+    if (!selectedPostId || !text.trim()) return;
 
-  const handleAddEventComment = async (
-    eventId: string | null,
-    text: string,
-  ) => {
-    if (!eventId || !text.trim()) return;
+    try {
+      await createComment({
+        postId: selectedPostId,
+        newComment: text,
+      });
+      console.log("✅ Comment created");
+    } catch (error) {
+      // This will now catch the 400 error specifically
+      console.error("Mutation Error:", error);
+    }
   };
 
   const handleOpenSheet = useCallback((id: string) => {
@@ -39,15 +60,20 @@ export default function PostScreen() {
     sheetRef.current?.expand();
   }, []);
 
-  const filteredPosts = MOCK_POSTS.filter(
-    (post) =>
-      post.author.username?.toLowerCase().includes(searchText.toLowerCase()) ||
-      post.content.toLowerCase().includes(searchText.toLowerCase()),
-  );
+  const filteredPosts =
+    searchText.trim() === ""
+      ? posts
+      : posts.filter(
+          (post) =>
+            post.anonName?.toLowerCase().includes(searchText.toLowerCase()) ||
+            post.body?.toLowerCase().includes(searchText.toLowerCase()),
+        );
+
+  // console.log(JSON.stringify(comments, null, 2));
 
   const Header = () => (
     <View
-      className="absolute top-0 left-0 right-0 z-10 bg-black/90 px-4 pb-4"
+      className="absolute top-0 left-0 right-0 bg-black/90 px-4 pb-4"
       style={{ paddingTop: insets.top + 5 }}
     >
       {/* STATIC TITLE */}
@@ -60,7 +86,10 @@ export default function PostScreen() {
       {/* FLOATING INTERACTIVE BAR */}
       <View className="flex-row items-center justify-between bg-white/10 rounded-full px-2 py-2 border border-white/10">
         {/* profile */}
-        <TouchableOpacity activeOpacity={0.7}>
+        <TouchableOpacity
+          activeOpacity={0.7}
+          onPress={() => router.push("/user/profile")}
+        >
           <Image
             source={{
               uri: user?.anonymousAvatarUrl,
@@ -96,7 +125,9 @@ export default function PostScreen() {
 
         {/* action */}
         <TouchableOpacity
-          onPress={() => setIsSearching(!isSearching)}
+          onPress={() => {
+            setIsSearching(!isSearching);
+          }}
           className="bg-dark-2 rounded-full size-[34px] flex items-center justify-center"
         >
           {isSearching ? (
@@ -110,29 +141,40 @@ export default function PostScreen() {
   );
 
   return (
-    <View className="flex-1 bg-black">
-      <FlatList
-        data={filteredPosts}
-        keyExtractor={(item) => item._id}
-        renderItem={({ item }) => (
-          <PostCard
-            post={item}
-            onPressEvent={() => handleOpenSheet(item._id)}
-          />
-        )}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{
-          paddingTop: insets.top + 160,
-          paddingBottom: 5,
-          paddingHorizontal: 8,
-        }}
-      />
-      <Header />
+    <View className="flex-1 bg-black" style={{ zIndex: -20 }}>
+      {isPostPending ? (
+        <View className="flex-1 items-center justify-center">
+          <ActivityIndicator size={"large"} color={COLORS["dark-1"]} />
+          <Text className="text-dark-1 text-xl font-semibold mt-2">
+            Loading...
+          </Text>
+        </View>
+      ) : (
+        <FlatList
+          data={filteredPosts}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <PostCard
+              post={item}
+              onPressEvent={() => handleOpenSheet(item.id)}
+            />
+          )}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{
+            paddingTop: insets.top + 160,
+            paddingBottom: 5,
+            paddingHorizontal: 8,
+          }}
+          ListEmptyComponent={EmptyState}
+        />
+      )}
       <CustomBottomSheet
         ref={sheetRef}
-        comments={eventComments}
-        onSendComment={(text) => handleAddEventComment(selectedPostId, text)}
+        isLoading={isCreateCommentPending}
+        comments={isCommentPending ? [] : (comments ?? [])}
+        onSendComment={(text) => handleAddEventComment(text)}
       />
+      <Header />
     </View>
   );
 }

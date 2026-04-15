@@ -1,6 +1,7 @@
-import { iutRegion, MOCK_CAMPUS_EVENTS } from "$/data/map";
+import { iutRegion } from "$/data/map";
 import { CampusMap as MapCampus } from "@/components/CampusMap";
 import GoogleMap from "@/components/GoogleMap";
+import { useGetPosts } from "@/hooks/usePosts";
 import { useGetMe, useSyncUser } from "@/hooks/useUser";
 import { COLORS } from "@/utils/colors";
 import { router } from "expo-router";
@@ -107,6 +108,10 @@ const Header = ({
 // ── MAIN SCREEN ──────────────────────────────────────────────────────────────
 export default function CampusMap() {
   const { user } = useGetMe();
+  const { posts } = useGetPosts({ category: "event" });
+
+  const campusEvents = posts.filter((post) => post.category === "event");
+  // console.log(campusEvents);
 
   const insets = useSafeAreaInsets();
   const [activeTab, setActiveTab] = useState<"map" | "events">("map");
@@ -139,7 +144,7 @@ export default function CampusMap() {
       {activeTab === "map" ? (
         <MapCampus iutRegion={iutRegion} />
       ) : (
-        <GoogleMap iutRegion={iutRegion} markers={MOCK_CAMPUS_EVENTS} />
+        <GoogleMap iutRegion={iutRegion} markers={campusEvents} />
       )}
 
       <Header
