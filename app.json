@@ -7,7 +7,6 @@
     "icon": "./assets/images/logo.png",
     "scheme": "campulse",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": false,
     "ios": {
       "supportsTablet": true
     },
@@ -17,7 +16,6 @@
         "monochromeImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#000000"
       },
-      "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "package": "com.codingcameroon.campulse"
     },
@@ -76,8 +74,7 @@
       "expo-localization"
     ],
     "experiments": {
-      "typedRoutes": true,
-      "reactCompiler": true
+      "typedRoutes": true
     },
     "extra": {
       "router": {},
